@@ -10,11 +10,11 @@ A premium interactive generative flower gallery — **hand-coded entirely from S
 
 ## 🌹 The Collection
 
-| Flower | Meaning | Details |
-|--------|---------|---------|
-| 🌹 **Rose** — *Passion* | Deep crimson layers | 60 petals across 8 rings, phyllotaxis spiral heart, rim-light strokes, dew drops |
-| 🌸 **Lily** — *Elegance* | Lavender whorls | 22 petals in 3 whorls, dorsal stripes, freckles, stamens with drifting pollen |
-| 🌻 **Sunflower** — *Joy* | Golden radial burst | 84 petals, 170 spiral seeds (golden angle 137.5°), glowing disc, sheen highlights |
+| Flower                   | Meaning             | Details                                                                           |
+| ------------------------ | ------------------- | --------------------------------------------------------------------------------- |
+| 🌹 **Rose** — _Passion_  | Deep crimson layers | 60 petals across 8 rings, phyllotaxis spiral heart, rim-light strokes, dew drops  |
+| 🌸 **Lily** — _Elegance_ | Lavender whorls     | 22 petals in 3 whorls, dorsal stripes, freckles, stamens with drifting pollen     |
+| 🌻 **Sunflower** — _Joy_ | Golden radial burst | 84 petals, 170 spiral seeds (golden angle 137.5°), glowing disc, sheen highlights |
 
 Each flower grows on a **complete plant** — a self-drawing stem, alternating leaves that unfold as the stem grows, and a green calyx of sepals beneath the blossom.
 
@@ -43,18 +43,18 @@ Or simply double-click `index.html` — no build step, no install.
 
 ## 🎮 Interactions
 
-| Action | Effect |
-|--------|--------|
-| **Hover** a flower | Glow intensifies, label reveals, gentle sway |
-| **Click** a flower | Re-bloom + light ripple + particle burst at your cursor |
-| **‹ › / dots / arrow keys** | Flip between flowers |
-| **Wait** | Ambient dust drifts, sunflower sheds gold, petals fall |
+| Action                      | Effect                                                  |
+| --------------------------- | ------------------------------------------------------- |
+| **Hover** a flower          | Glow intensifies, label reveals, gentle sway            |
+| **Click** a flower          | Re-bloom + light ripple + particle burst at your cursor |
+| **‹ › / dots / arrow keys** | Flip between flowers                                    |
+| **Wait**                    | Ambient dust drifts, sunflower sheds gold, petals fall  |
 
 ## 🛠️ How It's Built
 
 - **Petals** — SVG `<path>` shapes with per-petal CSS custom properties (`--d` delay, `--p0` closed transform, `--dur` duration) driving springy bloom transitions
 - **Seeds** — placed by phyllotaxis: `r = c·√n`, `θ = n·137.5°`
-- **Stems** — `stroke-dashoffset` animation makes the stem *grow* upward from the ground
+- **Stems** — `stroke-dashoffset` animation makes the stem _grow_ upward from the ground
 - **Leaves & sepals** — double-wrapped `<g>` elements: outer group carries the SVG positioning transform, inner group carries the CSS bloom animation (a CSS transform would otherwise override the attribute)
 - **Particles** — pre-rendered radial-gradient sprites drawn to one fixed canvas; types: ambient (`a`), burst (`b`), gold (`e`), petal (`p`)
 - **Reduced motion** — respects `prefers-reduced-motion` with lighter ambient effects
@@ -68,4 +68,4 @@ README.md
 
 ---
 
-*hand-coded svg · no images · no frameworks*
+_hand-coded svg · no images · no frameworks_
