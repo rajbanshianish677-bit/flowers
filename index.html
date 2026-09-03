@@ -8,22 +8,6 @@
   <meta name="description" content="An interactive generative flower gallery — pure SVG geometry, no images, no frameworks.">
   <title>Flowers — Generative Botanical Art</title>
   <style>
-    /* ============================================================
-   FLOWERS
-   Generative botanical art — pure HTML + CSS + SVG + vanilla JS.
-   No images. No frameworks. Everything below is geometry.
-   ------------------------------------------------------------
-   SECTIONS
-     1. Base & atmospheric background
-     2. Header typography
-     3. Garden layout & glass flower cards
-     4. Flower labels & click ripple
-     5. SVG animation system (petals, seeds, glow, decor)
-     6. Keyframes
-     7. Responsive & reduced-motion
-   ============================================================ */
-
-    /* ---------------- 1. base & background ---------------- */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -750,7 +734,6 @@
         padding-left: 0;
         padding-right: 0
       }
-
       .flower-card {
         width: min(94vw, 430px);
         min-height: 0;
@@ -944,14 +927,8 @@
   <div class="vignette" aria-hidden="true"></div>
   <canvas id="fx" aria-hidden="true"></canvas>
 
-  <!-- ============================================================
-     SHARED SVG DEFS — every gradient & filter used by the flowers.
-     One hidden SVG keeps the flower markup lean; url(#id) resolves
-     across the whole document.
-     ============================================================ -->
   <svg id="assets" width="0" height="0" aria-hidden="true" style="position:absolute">
     <defs>
-      <!-- reusable glow filters (feGaussianBlur + merge) -->
       <filter id="fGlow" x="-120%" y="-120%" width="340%" height="340%">
         <feGaussianBlur stdDeviation="3.5" result="b" />
         <feMerge>
@@ -961,7 +938,6 @@
         </feMerge>
       </filter>
 
-      <!-- ==================== ROSE ==================== -->
       <radialGradient id="roseHalo">
         <stop offset="0" stop-color="#ff2e6e" stop-opacity=".6" />
         <stop offset=".5" stop-color="#ff2e6e" stop-opacity=".22" />
@@ -1015,7 +991,6 @@
         <stop offset="1" stop-color="#ffd9e6" stop-opacity=".5" />
       </linearGradient>
 
-      <!-- ==================== LILY (oriental) ==================== -->
       <radialGradient id="lilyHalo">
         <stop offset="0" stop-color="#ff4fa3" stop-opacity=".55" />
         <stop offset=".5" stop-color="#ff4fa3" stop-opacity=".2" />
@@ -1061,7 +1036,6 @@
         <stop offset="1" stop-color="#fff" stop-opacity="0" />
       </linearGradient>
 
-      <!-- ==================== SUNFLOWER ==================== -->
       <radialGradient id="sunHalo">
         <stop offset="0" stop-color="#ffb703" stop-opacity=".55" />
         <stop offset=".5" stop-color="#ffb703" stop-opacity=".2" />
@@ -1099,7 +1073,6 @@
         <stop offset="1" stop-color="#8a5a1e" />
       </linearGradient>
 
-      <!-- ============ SHARED PLANT ANATOMY (stem / leaves / sepals) ============ -->
       <linearGradient id="stemGrad" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0" stop-color="#0e2a12" />
         <stop offset=".45" stop-color="#1e5c26" />
@@ -1146,12 +1119,6 @@
 
   <main class="garden">
 
-    <!-- ============================================================
-       FLOWER 1 — ROSE  (Passion)
-       39 overlapping petals in 6 rings + a tightly curled core.
-       Outer petals: large, deep crimson. Inner rings shrink and
-       pale toward a glowing pink heart.
-       ============================================================ -->
     <section class="flower-card" id="card-rose" data-flower="rose" tabindex="0" role="button"
       aria-label="Rose, passion. Activate to bloom." style="--accent:#ff4d7d;--glow:rgba(255,77,125,.45)">
       <div class="card-glow" aria-hidden="true"></div>
@@ -1176,13 +1143,6 @@
       </div>
     </section>
 
-    <!-- ============================================================
-       FLOWER 2 — ORIENTAL LILY  (Elegance)
-       A grand six-pointed star: broad magenta petals with white
-       rims and ruffled, recurved edges, dark-pink speckles, and
-       long yellow-green stamens rising from a green-gold heart.
-       A soft light sweep occasionally crosses the blossom.
-       ============================================================ -->
     <section class="flower-card" id="card-lily" data-flower="lily" tabindex="0" role="button"
       aria-label="Oriental lily, elegance. Activate to bloom." style="--accent:#ff6bb5;--glow:rgba(255,107,181,.42)">
       <div class="card-glow" aria-hidden="true"></div>
@@ -1211,13 +1171,6 @@
       </div>
     </section>
 
-    <!-- ============================================================
-       FLOWER 3 — SUNFLOWER  (Joy)
-       57 golden ray petals in three jittered rings (no two
-       match), dark sepals behind them, a warm glow hugging the
-       disc, and 220+ seeds & florets on a true phyllotaxis
-       spiral (golden angle 137.5°).
-       ============================================================ -->
     <section class="flower-card" id="card-sunflower" data-flower="sun" tabindex="0" role="button"
       aria-label="Sunflower, joy. Activate to bloom." style="--accent:#ffc94d;--glow:rgba(255,201,77,.42)">
       <div class="card-glow" aria-hidden="true"></div>
@@ -1249,9 +1202,6 @@
   <script>
     (function () {
       'use strict';
-      /* ============================================================
-         UTILITIES
-         ============================================================ */
       const NS = 'http://www.w3.org/2000/svg';
       const $ = (s, r) => (r || document).querySelector(s);
       const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
@@ -1266,45 +1216,27 @@
         return e;
       }
 
-      /* ============================================================
-         PETAL GEOMETRY — hand-drawn path data (local space: base at
-         the origin, petal grows upward along -Y)
-         ============================================================ */
-      /* rose: broad, cupped, slightly ruffled bloom petal */
       const ROSE_MAIN = 'M 0 6 C -30 4 -52 -6 -56 -30 C -60 -54 -50 -76 -30 -86 C -12 -95 12 -95 30 -86 C 50 -76 60 -54 56 -30 C 52 -6 30 4 0 6 Z';
-      /* rose: large ruffled outer guard petal (wider, wavier edge) */
       const ROSE_GUARD = 'M 0 8 C -40 6 -70 -8 -74 -36 C -78 -64 -62 -90 -38 -100 C -20 -108 -8 -96 0 -104 C 8 -96 20 -108 38 -100 C 62 -90 78 -64 74 -36 C 70 -8 40 6 0 8 Z';
-      /* rose: darkest back guard, widest of all — the outer silhouette */
       const ROSE_BACK = 'M 0 10 C -48 8 -82 -10 -86 -42 C -90 -74 -70 -102 -44 -112 C -24 -120 -10 -106 0 -116 C 10 -106 24 -120 44 -112 C 70 -102 90 -74 86 -42 C 82 -10 48 8 0 10 Z';
       const ROSE_CUP = 'M 0 2 C -22 0 -38 -8 -42 -26 C -46 -44 -38 -62 -24 -70 C -10 -77 10 -77 24 -70 C 38 -62 46 -44 42 -26 C 38 -8 22 0 0 2 Z';
       const ROSE_RIB = 'M 0 -4 C -5 -28 -4 -58 0 -82';
       const ROSE_EDGE = 'M -30 -86 C -12 -95 12 -95 30 -86';
       const ROSE_GUARD_EDGE = 'M -38 -100 C -20 -108 -8 -96 0 -104 C 8 -96 20 -108 38 -100';
       const ROSE_BACK_EDGE = 'M -44 -112 C -24 -120 -10 -106 0 -116 C 10 -106 24 -120 44 -112';
-      /* oriental lily: broad star petal with ruffled, recurved edges */
       const LILY_PETAL = 'M 0 0 C -12 -10 -20 -26 -26 -40 C -30 -50 -36 -58 -33 -68 C -29 -76 -26 -84 -29 -92 C -33 -100 -39 -108 -36 -116 C -36 -124 -31 -130 -30 -138 C -27 -146 -22 -150 -16 -153 C -10 -156 -4 -158 0 -159 C 4 -158 10 -156 16 -153 C 22 -150 27 -146 30 -138 C 31 -130 36 -124 36 -116 C 39 -108 33 -100 29 -92 C 26 -84 29 -76 33 -68 C 36 -58 30 -50 26 -40 C 20 -26 12 -10 0 0 Z';
       const LILY_CUP = 'M 0 -2 C -10 -16 -18 -40 -21 -64 C -23 -82 -20 -98 -23 -112 C -24 -124 -20 -136 -12 -144 C -7 -148 -3 -149 0 -150 C 3 -149 7 -148 12 -144 C 20 -136 24 -124 23 -112 C 20 -98 23 -82 21 -64 C 18 -40 10 -16 0 -2 Z';
       const LILY_VEIN = 'M 0 -10 C -2 -44 -1 -96 0 -140';
       const LILY_SIDE_VEIN_L = 'M -3 -22 C -12 -46 -16 -74 -12 -102';
       const LILY_SIDE_VEIN_R = 'M 3 -22 C 12 -46 16 -74 12 -102';
       const LILY_EDGE = 'M -33 -68 C -29 -76 -26 -84 -29 -92 C -33 -100 -39 -108 -36 -116 C -36 -124 -31 -130 -30 -138 C -27 -146 -22 -150 -16 -153 C -10 -156 -4 -158 0 -159 C 4 -158 10 -156 16 -153 C 22 -150 27 -146 30 -138 C 31 -130 36 -124 36 -116 C 39 -108 33 -100 29 -92 C 26 -84 29 -76 33 -68';
-      /* sunflower: wide golden ray with pointed tip (base at origin, tip at -110).
-         Drawn past the disc edge via translate(0,-base) so the wide part
-         of the blade stays visible outside the disc. */
       const SUN_PETAL = 'M 0 0 C -14 -8 -22 -34 -20 -62 C -18 -88 -8 -104 0 -110 C 8 -104 18 -88 20 -62 C 22 -34 14 -8 0 0 Z';
-      const SUN_GROOVE = 'M 0 -8 C -1.5 -34 -1 -72 0 -102';   /* centre crease */
-      const SUN_EDGE = 'M -20 -62 C -22 -34 -14 -8 0 0';    /* lit left edge */
+      const SUN_GROOVE = 'M 0 -8 C -1.5 -34 -1 -72 0 -102';
+      const SUN_EDGE = 'M -20 -62 C -22 -34 -14 -8 0 0';
       const SUN_TIP = 'M 0 -82 C -5 -94 -5 -103 0 -110 C 5 -103 5 -94 0 -82 Z';
       const SUN_SEPAL = 'M 0 0 C -7 -6 -10 -22 -5 -38 C -2 -46 2 -46 5 -38 C 10 -22 7 -6 0 0 Z';
 
-      /* ============================================================
-         ROSE SVG — six concentric rings of petals.
-         Rig transform per petal:  rotate(angle) translate(0,-off)
-         scale(s) rotate(flare)  — flare alternates sign so rings
-         swirl around the heart like a real rose.
-         ============================================================ */
       const ROSE_RINGS = [
-        /* n, offset, scale, flare, gradient, delay, opacity, edge-spark, shape */
         { n: 8, off: 12, s: 1.06, flare: 18, grad: 'rgGuard', d: 1.70, po: .9, spark: true, shape: 'back' },
         { n: 10, off: 10, s: 1.04, flare: 15, grad: 'rg0', d: 1.50, po: .92, spark: true, shape: 'guard' },
         { n: 9, off: 7, s: .87, flare: 12, grad: 'rg1', d: 1.15, po: .93, spark: true, shape: 'main' },
@@ -1403,14 +1335,6 @@
         }, curl2);
       }
 
-      /* ============================================================
-         ORIENTAL LILY SVG — three six-fold whorls (a shadowed back
-         star, the grand outer star, and an inner whorl) of broad
-         magenta petals with ruffled, recurved edges and white rims.
-         Dark-pink freckles dust the petals; long yellow-green
-         stamens and a pistil emerge after the bloom. A light sweep
-         occasionally crosses the blossom.
-         ============================================================ */
       function buildLily() {
         const host = $('#lily .petals'), core = $('#lily .core');
         const clip = E('clipPath', { id: 'lilyClip' }, $('#assets defs'));
@@ -1498,13 +1422,6 @@
         const sw = $('.sweep-wrap'); if (sw) sw.style.opacity = 1;
       }
 
-      /* ============================================================
-         SUNFLOWER SVG — three layered rings of golden rays (57 petals,
-         each jittered so no two match), dark sepals behind them, a
-         warm glow hugging the disc, and a disc carrying ~170 seeds on
-         a phyllotaxis spiral (golden angle 137.508°) plus a ring of
-         54 edge florets — all revealed in natural bloom order.
-         ============================================================ */
       function buildSunflower() {
         const host = $('#sunflower .petals'), core = $('#sunflower .core');
 
@@ -1591,17 +1508,6 @@
         }
       }
 
-      /* ============================================================
-         PLANT ANATOMY — stem, leaves and sepals shared by all three
-         flowers. The stem grows upward from the ground (stroke-dash
-         reveal), leaves unfold along it as the tip passes, and sepals
-         form a green calyx peeking below the blossom.
-         NOTE: each leaf/sepal is DOUBLE-WRAPPED — the OUTER <g> carries
-         the positioning transform attribute (CSS never overrides it),
-         while the INNER <g> carries the CSS bloom animation. A CSS
-         transform on the same element would discard the attribute and
-         collapse every leaf onto the blossom origin.
-         ============================================================ */
       const LEAF_SHAPE = 'M 0 0 C 14 -5 34 -3 48 6 C 34 17 13 19 0 12 C -3 8 -3 4 0 0 Z';
       const SEPAL_SHAPE = 'M 0 0 C -7 9 -6 22 0 33 C 6 22 7 9 0 0 Z';
       function buildPlant(f) {
@@ -1651,10 +1557,6 @@
         }
       }
 
-      /* ============================================================
-         DECORATIVE ENERGY — thin arcs, flowing loops and glowing
-         nodes orbiting each flower (kept subtle; the flower stars).
-         ============================================================ */
       function buildDecor(svg, accent) {
         const decor = $('.decor', svg);
         E('circle', { class: 'arc spin-a', r: 212, fill: 'none', stroke: accent, 'stroke-width': 1, 'stroke-dasharray': '3 16', opacity: .32 }, decor);
@@ -1677,11 +1579,6 @@
         });
       }
 
-      /* ============================================================
-         BLOOM SYSTEM — reusable, easing-driven via CSS transitions.
-         bloomRose() / bloomLily() / bloomSunflower() open a flower;
-         rebloom() closes it quickly and reopens (click interaction).
-         ============================================================ */
       const F = {
         rose: {
           key: 'rose', card: $('#card-rose'), svg: $('#card-rose .flower-svg'), group: $('#rose'),
@@ -1730,14 +1627,6 @@
         }, 520);
       }
 
-      /* ============================================================
-         PARTICLE SYSTEM — one lightweight canvas.
-         Ambient star-dust always drifts; bursts accompany clicks;
-         the sunflower breathes golden motes from its heart.
-         Glow sprites are pre-rendered once (cheap drawImage).
-         Adaptive: phones & low-end devices get fewer particles,
-         a capped DPR, and the loop pauses in hidden tabs.
-         ============================================================ */
       const cvs = $('#fx'), ctx = cvs.getContext('2d');
       let W = 0, H = 0;
       /* device tier: phones / reduced-motion / small screens = LOW */
@@ -1874,10 +1763,6 @@
         });
       }, LOW ? 2600 : 1500);
 
-      /* ============================================================
-         USER INTERACTION — hover glows are pure CSS; clicks re-bloom,
-         spawn a ripple + particle burst, and excite the flower.
-         ============================================================ */
       function excite(card) {
         card.classList.add('excited');
         clearTimeout(card._t);
@@ -1908,11 +1793,6 @@
         });
       });
 
-      /* ============================================================
-         STAGE NAVIGATION — one flower on stage at a time; prev/next
-         buttons, dots and arrow keys flip between them. A flower
-         blooms the first time it takes the stage.
-         ============================================================ */
       const ORDER = ['rose', 'lily', 'sun'];
       let stage = 0;
       function showStage(i) {
@@ -1932,10 +1812,6 @@
         else if (e.key === 'ArrowRight') showStage(stage + 1);
       });
 
-      /* ============================================================
-         INIT — build all geometry, then bloom each flower as it
-         enters the viewport (staggered on first load).
-         ============================================================ */
       Object.values(F).forEach(f => {
         f.build(); f.built = true;
         f.nodes = $$('.petal,.seed', f.group);
