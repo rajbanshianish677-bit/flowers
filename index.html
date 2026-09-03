@@ -718,60 +718,113 @@
       text-transform: uppercase
     }
 
-    /* tablets & small laptops */
-    @media (max-width:1020px) {
-      .flower-card {
-        width: min(92vw, 560px)
+    /* ============================================================
+       AUTO-FIT MOBILE LAYOUT
+       On phones (portrait OR landscape) the page becomes a flex
+       column that fills EXACTLY the screen: header, nav and footer
+       shrink to their content, and the flower card flexes to absorb
+       every remaining pixel — so the whole experience fits without
+       scrolling, on any screen size or orientation.
+       Matches: narrow screens (portrait phones) OR short screens
+       (landscape phones), i.e. anything a fixed layout can't fit.
+       ============================================================ */
+    @media (max-width:640px),
+    (max-height:520px) {
+
+      /* the page is exactly one screen tall — nothing scrolls */
+      html,
+      body {
+        height: 100%;
+        overflow: hidden
       }
-    }
 
-    /* phones — larger touch targets, tighter layout, lighter effects */
-    @media (max-width:640px) {
+      body {
+        display: flex;
+        flex-direction: column
+      }
 
-      /* card is 94vw — drop the garden's side padding so the flower
-         never pushes past the viewport (no horizontal scrolling) */
+      .site-head {
+        flex: 0 0 auto;
+        padding: 2.5vh 5vw 1.2vh
+      }
+
+      .title {
+        font-size: clamp(1.5rem, 7.5vw, 2.4rem)
+      }
+
+      .subtitle {
+        margin-top: .5rem;
+        font-size: clamp(.68rem, 3vw, .82rem);
+        letter-spacing: .06em
+      }
+
+      .hint {
+        margin-top: .5rem;
+        font-size: .58rem;
+        letter-spacing: .18em
+      }
+
+      .divider {
+        margin: .9rem auto 0
+      }
+
+      /* nav hugs the header; buttons stay thumb-sized */
+      .stage-nav {
+        flex: 0 0 auto;
+        gap: 16px;
+        padding: .8vh 4vw .6vh
+      }
+
+      .nav-btn {
+        width: 46px;
+        height: 46px;
+        font-size: 1.3rem
+      }
+
+      .stage-dots {
+        gap: 10px
+      }
+
+      /* the garden takes ALL remaining vertical space. It stays a
+         grid so the three cards keep sharing one cell (stacked,
+         centered) — switching to flex would lay them out in a row
+         and shove the active flower off-center. */
       .garden {
-        padding-left: 0;
-        padding-right: 0
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 0
       }
+
+      /* the card fills the garden both ways — auto-resizing with
+         the screen instead of using a fixed pixel height. In
+         landscape the width yields to the tight height. */
       .flower-card {
         width: min(94vw, 430px);
+        height: 100%;
+        max-height: 100%;
+        aspect-ratio: auto;
         min-height: 0;
-        border-radius: 24px;
+        border-radius: 22px;
         -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px)
       }
 
-      .nav-btn {
-        width: 48px;
-        height: 48px;
-        font-size: 1.35rem
+      @media (orientation:landscape) {
+        .flower-card {
+          width: auto;
+          max-width: 94vw
+        }
       }
 
-      .stage-dots {
-        gap: 11px
+      .flower-svg {
+        height: 100%;
+        width: 100%
       }
 
-      .stage-nav {
-        gap: 18px;
-        padding: 1.6vh 4vw 1vh
-      }
-
-      .site-head {
-        padding: 5vh 5vw 3vh
-      }
-
-      .title {
-        font-size: clamp(2rem, 9vw, 2.8rem)
-      }
-
-      .subtitle {
-        font-size: .8rem;
-        letter-spacing: .08em
-      }
-
-      .hint {
-        font-size: .62rem;
+      .site-foot {
+        flex: 0 0 auto;
+        padding: .6vh 4vw 1.4vh;
+        font-size: .56rem;
         letter-spacing: .22em
       }
 
@@ -812,19 +865,19 @@
       }
     }
 
-    /* very small phones — keep everything reachable */
+    /* very small phones — shrink type a touch more so it all fits */
     @media (max-width:380px) {
       .title {
-        font-size: clamp(1.7rem, 11vw, 2.2rem)
+        font-size: clamp(1.3rem, 9vw, 1.9rem)
       }
 
       .subtitle {
-        font-size: .74rem
+        font-size: .66rem
       }
 
       .nav-btn {
-        width: 44px;
-        height: 44px
+        width: 42px;
+        height: 42px
       }
 
       .stage-nav {
@@ -841,19 +894,20 @@
       }
     }
 
-    /* landscape phones: shrink the header so the flower stays visible */
+    /* landscape phones: header collapses to one compact band so the
+       flower keeps the majority of the screen */
     @media (max-height:480px) and (orientation:landscape) {
       .site-head {
-        padding: 2vh 5vw 1.5vh
+        padding: 1vh 5vw .6vh
       }
 
       .title {
-        font-size: clamp(1.6rem, 6vh, 2.2rem)
+        font-size: clamp(1.2rem, 5.5vh, 1.8rem)
       }
 
       .subtitle {
-        margin-top: .4rem;
-        font-size: .74rem
+        margin-top: .2rem;
+        font-size: .68rem
       }
 
       .hint {
@@ -861,7 +915,15 @@
       }
 
       .divider {
-        margin: 1rem auto 0
+        margin: .5rem auto 0
+      }
+
+      .stage-nav {
+        padding: .4vh 4vw .3vh
+      }
+
+      .site-foot {
+        display: none
       }
     }
 
