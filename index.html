@@ -381,11 +381,16 @@
     }
 
     /* ---------------- 5. SVG animation system ---------------- */
-    /* decorative rotating arcs & flowing energy loops */
+    /* decorative rotating arcs & flowing energy loops
+   NOTE: fill-box, not view-box — the viewBox origin is (-250,-250),
+   so view-box + 50% 50% would pivot around the visible area's
+   bottom-right corner instead of its center, flinging the arcs
+   off-center while they spin. fill-box pivots each arc around
+   its own center (the circles sit at 0,0), keeping them concentric. */
     .flower-svg .arc,
     .flower-svg .loop {
-      transform-box: view-box;
-      transform-origin: 50% 50%
+      transform-box: fill-box;
+      transform-origin: center
     }
 
     .arc.spin-a {
@@ -441,10 +446,13 @@
       animation: breathe 5.5s ease-in-out infinite
     }
 
-    /* whole-flower idle sway + stronger hover sway (nested wrappers avoid conflicts) */
+    /* whole-flower idle sway + stronger hover sway (nested wrappers avoid conflicts).
+   fill-box keeps the sway pivoting around the blossom's own center —
+   view-box percentages would resolve against the (-250,-250) viewBox
+   and pivot around the wrong corner, sliding the flower sideways. */
     .flower-hover {
-      transform-box: view-box;
-      transform-origin: 50% 50%
+      transform-box: fill-box;
+      transform-origin: center
     }
 
     .flower-card:hover .flower-hover {
@@ -452,8 +460,8 @@
     }
 
     .flower-live {
-      transform-box: view-box;
-      transform-origin: 50% 50%;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: sway 9s ease-in-out infinite
     }
 
