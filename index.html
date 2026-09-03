@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Programmer's Flowers — Generative Botanical Art</title>
-<style>
-/* ============================================================
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Programmer's Flowers — Generative Botanical Art</title>
+  <style>
+    /* ============================================================
    PROGRAMMER'S FLOWERS
    Generative botanical art — pure HTML + CSS + SVG + vanilla JS.
    No images. No frameworks. Everything below is geometry.
@@ -20,1119 +21,1785 @@
      7. Responsive & reduced-motion
    ============================================================ */
 
-/* ---------------- 1. base & background ---------------- */
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  min-height:100vh;background:#050308;color:#e9e6f4;overflow-x:hidden;
-  font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
-  -webkit-font-smoothing:antialiased;
-}
-/* deep purple / blue nebula wash on near-black */
-body::before{content:"";position:fixed;inset:0;z-index:-3;
-  background:
-    radial-gradient(1100px 720px at 12% -10%,rgba(88,28,135,.30),transparent 62%),
-    radial-gradient(1000px 780px at 90% 110%,rgba(30,58,138,.26),transparent 62%),
-    radial-gradient(820px 560px at 50% 120%,rgba(130,20,70,.14),transparent 60%),
-    linear-gradient(180deg,#07030d,#050308 42%,#090511);
-}
-/* faint film grain (static SVG turbulence — rendered once, cheap) */
-.noise{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");}
-/* cinematic edge vignette */
-.vignette{position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:radial-gradient(125% 95% at 50% 42%,transparent 52%,rgba(2,0,8,.6) 100%)}
-/* particle canvas floats just above the garden like glowing dust */
-#fx{position:fixed;inset:0;z-index:3;pointer-events:none}
+    /* ---------------- 1. base & background ---------------- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-/* ---------------- 2. header ---------------- */
-.site-head{position:relative;z-index:2;text-align:center;padding:8vh 5vw 4.5vh}
-.title{
-  font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;
-  font-size:clamp(2.6rem,7vw,4.8rem);letter-spacing:.015em;line-height:1.05;
-  background:linear-gradient(180deg,#ffffff 15%,#e8dcff 55%,#c9b4ff 95%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  animation:titleGlow 7s ease-in-out infinite;
-}
-.subtitle{margin-top:1rem;color:rgba(230,225,248,.6);font-size:clamp(.82rem,1.5vw,1.02rem);letter-spacing:.12em;font-weight:350}
-.hint{margin-top:.9rem;color:rgba(255,255,255,.34);font-size:.72rem;letter-spacing:.34em;text-transform:uppercase}
+    body {
+      min-height: 100vh;
+      background: #050308;
+      color: #e9e6f4;
+      overflow-x: hidden;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
 
-/* ornamental divider under the header — a thin vine with a glowing bud */
-.divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:2.2rem auto 0;max-width:420px}
-.divider .line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,180,255,.45))}
-.divider .line.r{background:linear-gradient(90deg,rgba(200,180,255,.45),transparent)}
-.divider .bud{width:7px;height:7px;border-radius:50%;background:#e8d5ff;
-  box-shadow:0 0 12px 2px rgba(180,140,255,.55);animation:nodePulse 4s ease-in-out infinite}
+    /* deep purple / blue nebula wash on near-black */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      background:
+        radial-gradient(1100px 720px at 12% -10%, rgba(88, 28, 135, .30), transparent 62%),
+        radial-gradient(1000px 780px at 90% 110%, rgba(30, 58, 138, .26), transparent 62%),
+        radial-gradient(820px 560px at 50% 120%, rgba(130, 20, 70, .14), transparent 60%),
+        linear-gradient(180deg, #07030d, #050308 42%, #090511);
+    }
 
-/* ---------------- 3. garden & cards ---------------- */
-.garden{position:relative;z-index:2;display:grid;place-items:center;padding:0 4vw 2vh;max-width:1520px;margin:0 auto}
-/* glass-like flower environment — not an ordinary rectangle.
+    /* faint film grain (static SVG turbulence — rendered once, cheap) */
+    .noise {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .05;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* cinematic edge vignette */
+    .vignette {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(125% 95% at 50% 42%, transparent 52%, rgba(2, 0, 8, .6) 100%)
+    }
+
+    /* particle canvas floats just above the garden like glowing dust */
+    #fx {
+      position: fixed;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none
+    }
+
+    /* ---------------- 2. header ---------------- */
+    .site-head {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 8vh 5vw 4.5vh
+    }
+
+    .title {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-style: italic;
+      font-weight: 700;
+      font-size: clamp(2.6rem, 7vw, 4.8rem);
+      letter-spacing: .015em;
+      line-height: 1.05;
+      background: linear-gradient(180deg, #ffffff 15%, #e8dcff 55%, #c9b4ff 95%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: titleGlow 7s ease-in-out infinite;
+    }
+
+    .subtitle {
+      margin-top: 1rem;
+      color: rgba(230, 225, 248, .6);
+      font-size: clamp(.82rem, 1.5vw, 1.02rem);
+      letter-spacing: .12em;
+      font-weight: 350
+    }
+
+    .hint {
+      margin-top: .9rem;
+      color: rgba(255, 255, 255, .34);
+      font-size: .72rem;
+      letter-spacing: .34em;
+      text-transform: uppercase
+    }
+
+    /* ornamental divider under the header — a thin vine with a glowing bud */
+    .divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin: 2.2rem auto 0;
+      max-width: 420px
+    }
+
+    .divider .line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200, 180, 255, .45))
+    }
+
+    .divider .line.r {
+      background: linear-gradient(90deg, rgba(200, 180, 255, .45), transparent)
+    }
+
+    .divider .bud {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #e8d5ff;
+      box-shadow: 0 0 12px 2px rgba(180, 140, 255, .55);
+      animation: nodePulse 4s ease-in-out infinite
+    }
+
+    /* ---------------- 3. garden & cards ---------------- */
+    .garden {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      padding: 0 4vw 2vh;
+      max-width: 1520px;
+      margin: 0 auto
+    }
+
+    /* glass-like flower environment — not an ordinary rectangle.
    All three cards share one grid cell (stacked); only the card
    holding .active is visible, so the garden presents one flower
    at a time and the nav buttons flip between them. */
-.flower-card{
-  position:relative;grid-area:1/1;width:min(88vw,560px);aspect-ratio:1/1.25;min-height:340px;
-  border-radius:32px;border:1px solid rgba(255,255,255,.08);
-  background:radial-gradient(120% 100% at 50% 0%,rgba(255,255,255,.055),rgba(255,255,255,.015) 46%,transparent 72%);
-  -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
-  cursor:pointer;overflow:hidden;user-select:none;-webkit-tap-highlight-color:transparent;outline:none;
-  opacity:0;transform:scale(.92) translateY(28px);visibility:hidden;
-  transition:opacity .65s ease,transform .65s cubic-bezier(.22,1,.36,1),
-             border-color .6s ease,box-shadow .7s ease,visibility 0s .65s;
-}
-.flower-card.active{opacity:1;transform:none;visibility:visible;transition-delay:0s}
-.flower-card:hover,.flower-card:focus-visible{
-  border-color:var(--accent);
-  box-shadow:0 0 80px -22px var(--glow),inset 0 0 60px -30px var(--glow);
-}
-/* soft radial glow living inside each card */
-.card-glow{position:absolute;inset:-14%;pointer-events:none;opacity:.22;
-  background:radial-gradient(52% 52% at 50% 46%,var(--glow),transparent 72%);
-  transition:opacity .8s ease,transform .8s ease}
-.flower-card:hover .card-glow{opacity:.4}
-.flower-card.excited .card-glow{opacity:.65;transform:scale(1.12)}
-.flower-svg{display:block;width:100%;height:auto;overflow:visible;
-  transition:transform .9s cubic-bezier(.22,1,.36,1)}
-.flower-card:hover .flower-svg{transform:scale(1.025)}
-.flower-card.excited .flower-svg{transform:scale(1.05)}
-/* flowers fill their environment: viewBox is -250..250, so a mild
+    .flower-card {
+      position: relative;
+      grid-area: 1/1;
+      width: min(88vw, 560px);
+      aspect-ratio: 1/1.25;
+      min-height: 340px;
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      background: radial-gradient(120% 100% at 50% 0%, rgba(255, 255, 255, .055), rgba(255, 255, 255, .015) 46%, transparent 72%);
+      -webkit-backdrop-filter: blur(7px);
+      backdrop-filter: blur(7px);
+      cursor: pointer;
+      overflow: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+      opacity: 0;
+      transform: scale(.92) translateY(28px);
+      visibility: hidden;
+      transition: opacity .65s ease, transform .65s cubic-bezier(.22, 1, .36, 1),
+        border-color .6s ease, box-shadow .7s ease, visibility 0s .65s;
+    }
+
+    .flower-card.active {
+      opacity: 1;
+      transform: none;
+      visibility: visible;
+      transition-delay: 0s
+    }
+
+    .flower-card:hover,
+    .flower-card:focus-visible {
+      border-color: var(--accent);
+      box-shadow: 0 0 80px -22px var(--glow), inset 0 0 60px -30px var(--glow);
+    }
+
+    /* soft radial glow living inside each card */
+    .card-glow {
+      position: absolute;
+      inset: -14%;
+      pointer-events: none;
+      opacity: .22;
+      background: radial-gradient(52% 52% at 50% 46%, var(--glow), transparent 72%);
+      transition: opacity .8s ease, transform .8s ease
+    }
+
+    .flower-card:hover .card-glow {
+      opacity: .4
+    }
+
+    .flower-card.excited .card-glow {
+      opacity: .65;
+      transform: scale(1.12)
+    }
+
+    .flower-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+      transition: transform .9s cubic-bezier(.22, 1, .36, 1)
+    }
+
+    .flower-card:hover .flower-svg {
+      transform: scale(1.025)
+    }
+
+    .flower-card.excited .flower-svg {
+      transform: scale(1.05)
+    }
+
+    /* flowers fill their environment: viewBox is -250..250, so a mild
    uniform scale-up enlarges the blossom without breaking layout.
    The blossom head is lifted so it sits atop the stem below it. */
-#rose .flower-live,#lily .flower-live,#sunflower .flower-live{scale:1.22}
-#rose .flower-hover,#lily .flower-hover,#sunflower .flower-hover{translate:0 -46px}
+    #rose .flower-live,
+    #lily .flower-live,
+    #sunflower .flower-live {
+      scale: 1.22
+    }
 
-/* ---------------- 4. labels & ripple ---------------- */
-.flower-label{position:absolute;left:50%;bottom:3.5%;transform:translate(-50%,14px);
-  display:flex;flex-direction:column;align-items:center;gap:.12rem;opacity:0;
-  transition:opacity .55s ease,transform .55s ease;pointer-events:none;text-align:center}
-.flower-card:hover .flower-label,
-.flower-card.excited .flower-label,
-.flower-card:focus-visible .flower-label{opacity:1;transform:translate(-50%,0)}
-.fl-emoji{font-size:1.35rem;filter:drop-shadow(0 0 10px var(--glow))}
-.fl-name{font-weight:700;font-size:.95rem;letter-spacing:.44em;padding-left:.44em;color:#fff;text-shadow:0 0 18px var(--glow)}
-.fl-sub{font-family:Georgia,serif;font-style:italic;font-size:1rem;color:var(--accent);text-shadow:0 0 14px var(--glow)}
-/* light ripple born at the click point */
-.ripple{position:absolute;width:330px;height:330px;border-radius:50%;border:1.5px solid var(--accent);
-  box-shadow:0 0 30px var(--glow),inset 0 0 30px var(--glow);opacity:.8;pointer-events:none;z-index:5;
-  transform:translate(-50%,-50%) scale(.05);animation:rip .95s cubic-bezier(.2,.65,.3,1) forwards}
+    /* the oriental lily is the grandest blossom — claim more of the stage */
+    #lily .flower-live {
+      scale: 1.28
+    }
 
-/* ---------------- 4b. stage navigation ---------------- */
-.stage-nav{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:26px;
-  padding:2.2vh 4vw 1vh}
-.nav-btn{width:54px;height:54px;border-radius:50%;border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.05);color:#e9e6f4;font-size:1.7rem;line-height:1;cursor:pointer;
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  transition:border-color .3s ease,box-shadow .3s ease,transform .3s ease}
-.nav-btn:hover,.nav-btn:focus-visible{border-color:#c9a7ff;box-shadow:0 0 26px -6px rgba(180,140,255,.55);
-  transform:scale(1.08);outline:none}
-.nav-btn:active{transform:scale(.94)}
-.stage-dots{display:flex;gap:14px}
-.dot{width:11px;height:11px;border-radius:50%;border:none;padding:0;cursor:pointer;
-  background:rgba(255,255,255,.18);transition:background .35s ease,box-shadow .35s ease,transform .35s ease}
-.dot.active{background:var(--accent);box-shadow:0 0 14px var(--accent);transform:scale(1.35)}
+    #rose .flower-hover,
+    #lily .flower-hover,
+    #sunflower .flower-hover {
+      translate: 0 -46px
+    }
 
-/* ---------------- 5. SVG animation system ---------------- */
-/* decorative rotating arcs & flowing energy loops */
-.flower-svg .arc,.flower-svg .loop{transform-box:view-box;transform-origin:50% 50%}
-.arc.spin-a{animation:spin 85s linear infinite}
-.arc.spin-b{animation:spinRev 140s linear infinite}
-.loop{stroke-dasharray:8 210}
-.loop.flow{animation:dashFlow 17s linear infinite}
-.loop.flow.rev{animation-direction:reverse}
-/* small glowing nodes on the loops */
-.node{transform-box:fill-box;transform-origin:center;animation:nodePulse 3.2s ease-in-out infinite}
-/* breathing halos & cores */
-.halo,.halo-boost,.core-glow{transform-box:fill-box;transform-origin:center}
-.halo{animation:breathe 7s ease-in-out infinite}
-.halo-boost{opacity:0;transition:opacity .8s ease}
-.flower-card:hover .halo-boost,.flower-card.excited .halo-boost{opacity:.75}
-.core-glow{animation:breathe 5.5s ease-in-out infinite}
-/* whole-flower idle sway + stronger hover sway (nested wrappers avoid conflicts) */
-.flower-hover{transform-box:view-box;transform-origin:50% 50%}
-.flower-card:hover .flower-hover{animation:hoverSway 4.6s ease-in-out infinite}
-.flower-live{transform-box:view-box;transform-origin:50% 50%;animation:sway 9s ease-in-out infinite}
-/* ---- PETAL ANIMATION ----
+    /* ---------------- 4. labels & ripple ---------------- */
+    .flower-label {
+      position: absolute;
+      left: 50%;
+      bottom: 3.5%;
+      transform: translate(-50%, 14px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .12rem;
+      opacity: 0;
+      transition: opacity .55s ease, transform .55s ease;
+      pointer-events: none;
+      text-align: center
+    }
+
+    .flower-card:hover .flower-label,
+    .flower-card.excited .flower-label,
+    .flower-card:focus-visible .flower-label {
+      opacity: 1;
+      transform: translate(-50%, 0)
+    }
+
+    .fl-emoji {
+      font-size: 1.35rem;
+      filter: drop-shadow(0 0 10px var(--glow))
+    }
+
+    .fl-name {
+      font-weight: 700;
+      font-size: .95rem;
+      letter-spacing: .44em;
+      padding-left: .44em;
+      color: #fff;
+      text-shadow: 0 0 18px var(--glow)
+    }
+
+    .fl-sub {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--accent);
+      text-shadow: 0 0 14px var(--glow)
+    }
+
+    /* light ripple born at the click point */
+    .ripple {
+      position: absolute;
+      width: 330px;
+      height: 330px;
+      border-radius: 50%;
+      border: 1.5px solid var(--accent);
+      box-shadow: 0 0 30px var(--glow), inset 0 0 30px var(--glow);
+      opacity: .8;
+      pointer-events: none;
+      z-index: 5;
+      transform: translate(-50%, -50%) scale(.05);
+      animation: rip .95s cubic-bezier(.2, .65, .3, 1) forwards
+    }
+
+    /* ---------------- 4b. stage navigation ---------------- */
+    .stage-nav {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
+      padding: 2.2vh 4vw 1vh
+    }
+
+    .nav-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, .14);
+      background: rgba(255, 255, 255, .05);
+      color: #e9e6f4;
+      font-size: 1.7rem;
+      line-height: 1;
+      cursor: pointer;
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease
+    }
+
+    .nav-btn:hover,
+    .nav-btn:focus-visible {
+      border-color: #c9a7ff;
+      box-shadow: 0 0 26px -6px rgba(180, 140, 255, .55);
+      transform: scale(1.08);
+      outline: none
+    }
+
+    .nav-btn:active {
+      transform: scale(.94)
+    }
+
+    .stage-dots {
+      display: flex;
+      gap: 14px
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      background: rgba(255, 255, 255, .18);
+      transition: background .35s ease, box-shadow .35s ease, transform .35s ease
+    }
+
+    .dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 14px var(--accent);
+      transform: scale(1.35)
+    }
+
+    /* ---------------- 5. SVG animation system ---------------- */
+    /* decorative rotating arcs & flowing energy loops */
+    .flower-svg .arc,
+    .flower-svg .loop {
+      transform-box: view-box;
+      transform-origin: 50% 50%
+    }
+
+    .arc.spin-a {
+      animation: spin 85s linear infinite
+    }
+
+    .arc.spin-b {
+      animation: spinRev 140s linear infinite
+    }
+
+    .loop {
+      stroke-dasharray: 8 210
+    }
+
+    .loop.flow {
+      animation: dashFlow 17s linear infinite
+    }
+
+    .loop.flow.rev {
+      animation-direction: reverse
+    }
+
+    /* small glowing nodes on the loops */
+    .node {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: nodePulse 3.2s ease-in-out infinite
+    }
+
+    /* breathing halos & cores */
+    .halo,
+    .halo-boost,
+    .core-glow {
+      transform-box: fill-box;
+      transform-origin: center
+    }
+
+    .halo {
+      animation: breathe 7s ease-in-out infinite
+    }
+
+    .halo-boost {
+      opacity: 0;
+      transition: opacity .8s ease
+    }
+
+    .flower-card:hover .halo-boost,
+    .flower-card.excited .halo-boost {
+      opacity: .75
+    }
+
+    .core-glow {
+      animation: breathe 5.5s ease-in-out infinite
+    }
+
+    /* whole-flower idle sway + stronger hover sway (nested wrappers avoid conflicts) */
+    .flower-hover {
+      transform-box: view-box;
+      transform-origin: 50% 50%
+    }
+
+    .flower-card:hover .flower-hover {
+      animation: hoverSway 4.6s ease-in-out infinite
+    }
+
+    .flower-live {
+      transform-box: view-box;
+      transform-origin: 50% 50%;
+      animation: sway 9s ease-in-out infinite
+    }
+
+    /* ---- PETAL ANIMATION ----
    Every petal is born closed (--p0) and opens when .bloomed is set.
    --d  : per-petal delay (staggered, organic waves)
    --dur: transition duration (shortened during fast re-bloom)
    --ease: springy bezier with a slight overshoot — feels alive */
-.petal{opacity:0;transform:var(--p0,scale(.1));transform-box:fill-box;transform-origin:50% 100%;
-  transition:transform var(--dur,1.5s) var(--ease,cubic-bezier(.25,1.35,.35,1)) var(--d,0s),
-             opacity calc(var(--dur,1.5s)*.72) ease var(--d,0s)}
-.petal.disc{transform-origin:50% 50%}
-.flower.bloomed .petal{opacity:var(--po,1);transform:none}
-/* sunflower seeds fade in progressively, spiraling outward */
-.seed{opacity:0;transition:opacity .55s ease var(--d,0s)}
-.flower.bloomed .seed{opacity:.95}
-/* bright light traveling along petal edges */
-.spark{stroke:#fff;stroke-width:1.5;opacity:.9;stroke-linecap:round;
-  stroke-dasharray:12 148;animation:sparkDash 3.4s linear infinite}
-/* occasional soft light sweep across the lily */
-.sweep-wrap{opacity:0;transition:opacity 1.4s ease;pointer-events:none}
-.sweep-bar{mix-blend-mode:screen;opacity:.5;animation:sweep 11s ease-in-out infinite}
-/* fast re-bloom mode (click) */
-.flower-card.fast .petal{--dur:.6s}
-.flower-card.fast .seed{transition-duration:.3s}
-.flower-card.fast .stem{transition-duration:.45s;transition-delay:0s}
-.flower-card.fast .leaf,.flower-card.fast .sepal{transition-duration:.45s;transition-delay:0s}
+    .petal {
+      opacity: 0;
+      transform: var(--p0, scale(.1));
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+      transition: transform var(--dur, 1.5s) var(--ease, cubic-bezier(.25, 1.35, .35, 1)) var(--d, 0s),
+        opacity calc(var(--dur, 1.5s)*.72) ease var(--d, 0s)
+    }
 
-/* dew drops on petals — tiny glass beads with a highlight dot */
-.dew{opacity:0;transition:opacity 1.2s ease 2.2s}
-.flower.bloomed .dew{opacity:.85}
-/* lily freckles & sunflower sheen fade in with the petals */
-.freckle,.pollen,.sheen{opacity:0;transition:opacity 1s ease 1.8s}
-.flower.bloomed .freckle,.flower.bloomed .pollen,.flower.bloomed .sheen{opacity:1}
-/* plant anatomy: the stem draws itself upward (stroke-dashoffset),
+    .petal.disc {
+      transform-origin: 50% 50%
+    }
+
+    .flower.bloomed .petal {
+      opacity: var(--po, 1);
+      transform: none
+    }
+
+    /* sunflower seeds fade in progressively, spiraling outward */
+    .seed {
+      opacity: 0;
+      transition: opacity .55s ease var(--d, 0s)
+    }
+
+    .flower.bloomed .seed {
+      opacity: .95
+    }
+
+    /* bright light traveling along petal edges */
+    .spark {
+      stroke: #fff;
+      stroke-width: 1.5;
+      opacity: .9;
+      stroke-linecap: round;
+      stroke-dasharray: 12 148;
+      animation: sparkDash 3.4s linear infinite
+    }
+
+    /* occasional soft light sweep across the lily */
+    .sweep-wrap {
+      opacity: 0;
+      transition: opacity 1.4s ease;
+      pointer-events: none
+    }
+
+    .sweep-bar {
+      mix-blend-mode: screen;
+      opacity: .5;
+      animation: sweep 11s ease-in-out infinite
+    }
+
+    /* fast re-bloom mode (click) */
+    .flower-card.fast .petal {
+      --dur: .6s
+    }
+
+    .flower-card.fast .seed {
+      transition-duration: .3s
+    }
+
+    .flower-card.fast .stem {
+      transition-duration: .45s;
+      transition-delay: 0s
+    }
+
+    .flower-card.fast .leaf,
+    .flower-card.fast .sepal {
+      transition-duration: .45s;
+      transition-delay: 0s
+    }
+
+    /* dew drops on petals — tiny glass beads with a highlight dot */
+    .dew {
+      opacity: 0;
+      transition: opacity 1.2s ease 2.2s
+    }
+
+    .flower.bloomed .dew {
+      opacity: .85
+    }
+
+    /* lily freckles & sunflower sheen fade in with the petals */
+    .freckle,
+    .pollen,
+    .sheen {
+      opacity: 0;
+      transition: opacity 1s ease 1.8s
+    }
+
+    .flower.bloomed .freckle,
+    .flower.bloomed .pollen,
+    .flower.bloomed .sheen {
+      opacity: 1
+    }
+
+    /* plant anatomy: the stem draws itself upward (stroke-dashoffset),
    then leaves and sepals unfold from their attachment points */
-.stem{stroke-dasharray:230;stroke-dashoffset:230;
-  transition:stroke-dashoffset 1.7s ease .15s}
-.flower.bloomed .stem{stroke-dashoffset:0}
-.leaf,.sepal{opacity:0;transform:scale(.05);transform-box:fill-box;
-  transition:transform 1.1s cubic-bezier(.25,1.35,.35,1) var(--d,1s),
-             opacity .8s ease var(--d,1s)}
-.leaf{transform-origin:0% 50%}
-.sepal{transform-origin:50% 0%}.flower.bloomed .leaf,.flower.bloomed .sepal{opacity:1;transform:none}
+    .stem {
+      stroke-dasharray: 230;
+      stroke-dashoffset: 230;
+      transition: stroke-dashoffset 1.7s ease .15s
+    }
 
-/* ---------------- 6. keyframes ---------------- */
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes spinRev{to{transform:rotate(-360deg)}}
-@keyframes breathe{0%,100%{opacity:.42;transform:scale(1)}50%{opacity:.8;transform:scale(1.09)}}
-@keyframes sway{0%,100%{transform:rotate(-.7deg) scale(1)}50%{transform:rotate(.9deg) scale(1.018)}}
-@keyframes hoverSway{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(1deg) scale(1.02)}75%{transform:rotate(-1deg) scale(1.02)}}
-@keyframes dashFlow{to{stroke-dashoffset:-218}}
-@keyframes sparkDash{to{stroke-dashoffset:-160}}
-@keyframes nodePulse{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:.95;transform:scale(1.75)}}
-@keyframes rip{to{transform:translate(-50%,-50%) scale(1.18);opacity:0}}
-@keyframes sweep{0%{transform:translateX(-345px) skewX(-16deg)}
-  16%{transform:translateX(345px) skewX(-16deg)}
-  100%{transform:translateX(345px) skewX(-16deg)}}
-@keyframes titleGlow{
-  0%,100%{filter:drop-shadow(0 0 14px rgba(190,170,255,.32)) drop-shadow(0 0 52px rgba(140,100,255,.2))}
-  50%{filter:drop-shadow(0 0 26px rgba(214,196,255,.62)) drop-shadow(0 0 96px rgba(160,120,255,.4))}}
+    .flower.bloomed .stem {
+      stroke-dashoffset: 0
+    }
 
-/* ---------------- 7. responsive & motion ---------------- */
-.site-foot{position:relative;z-index:2;text-align:center;padding:1vh 4vw 5vh;
-  color:rgba(255,255,255,.3);font-size:.7rem;letter-spacing:.3em;text-transform:uppercase}
-@media (max-width:1020px){.flower-card{width:min(92vw,560px)}}
-@media (max-width:640px){
-  .flower-card{width:min(92vw,430px);min-height:0}
-  .nav-btn{width:46px;height:46px;font-size:1.35rem}
-  .stage-dots{gap:11px}
-  .site-head{padding-top:6vh}
-  .title{font-size:clamp(2.2rem,10vw,3rem)}
-  .subtitle{font-size:.8rem;letter-spacing:.08em}
-  .hint{font-size:.62rem;letter-spacing:.22em}
-  .fl-name{font-size:.85rem;letter-spacing:.34em;padding-left:.34em}
-  .fl-sub{font-size:.92rem}
-  .fl-emoji{font-size:1.2rem}
-  /* blossoms fill more of the card on small screens */
-  #rose .flower-live,#lily .flower-live,#sunflower .flower-live{scale:1.3}
-  #rose .flower-hover,#lily .flower-hover,#sunflower .flower-hover{translate:0 -40px}
-}
-/* touch devices have no hover — keep names visible once bloomed */
-@media (hover:none){.flower-card.bloomed .flower-label{opacity:1;transform:translate(-50%,0)}}
-@media (prefers-reduced-motion:reduce){
-  .arc,.loop,.node,.spark,.sweep-bar,.flower-live,.flower-hover,.halo,.core-glow,.title{animation:none!important}
-  .petal{--dur:.7s}
-}
-</style>
+    .leaf,
+    .sepal {
+      opacity: 0;
+      transform: scale(.05);
+      transform-box: fill-box;
+      transition: transform 1.1s cubic-bezier(.25, 1.35, .35, 1) var(--d, 1s),
+        opacity .8s ease var(--d, 1s)
+    }
+
+    .leaf {
+      transform-origin: 0% 50%
+    }
+
+    .sepal {
+      transform-origin: 50% 0%
+    }
+
+    .flower.bloomed .leaf,
+    .flower.bloomed .sepal {
+      opacity: 1;
+      transform: none
+    }
+
+    /* ---------------- 6. keyframes ---------------- */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    @keyframes spinRev {
+      to {
+        transform: rotate(-360deg)
+      }
+    }
+
+    @keyframes breathe {
+
+      0%,
+      100% {
+        opacity: .42;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .8;
+        transform: scale(1.09)
+      }
+    }
+
+    @keyframes sway {
+
+      0%,
+      100% {
+        transform: rotate(-.7deg) scale(1)
+      }
+
+      50% {
+        transform: rotate(.9deg) scale(1.018)
+      }
+    }
+
+    @keyframes hoverSway {
+
+      0%,
+      100% {
+        transform: rotate(0) scale(1)
+      }
+
+      25% {
+        transform: rotate(1deg) scale(1.02)
+      }
+
+      75% {
+        transform: rotate(-1deg) scale(1.02)
+      }
+    }
+
+    @keyframes dashFlow {
+      to {
+        stroke-dashoffset: -218
+      }
+    }
+
+    @keyframes sparkDash {
+      to {
+        stroke-dashoffset: -160
+      }
+    }
+
+    @keyframes nodePulse {
+
+      0%,
+      100% {
+        opacity: .35;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .95;
+        transform: scale(1.75)
+      }
+    }
+
+    @keyframes rip {
+      to {
+        transform: translate(-50%, -50%) scale(1.18);
+        opacity: 0
+      }
+    }
+
+    @keyframes sweep {
+      0% {
+        transform: translateX(-345px) skewX(-16deg)
+      }
+
+      16% {
+        transform: translateX(345px) skewX(-16deg)
+      }
+
+      100% {
+        transform: translateX(345px) skewX(-16deg)
+      }
+    }
+
+    @keyframes titleGlow {
+
+      0%,
+      100% {
+        filter: drop-shadow(0 0 14px rgba(190, 170, 255, .32)) drop-shadow(0 0 52px rgba(140, 100, 255, .2))
+      }
+
+      50% {
+        filter: drop-shadow(0 0 26px rgba(214, 196, 255, .62)) drop-shadow(0 0 96px rgba(160, 120, 255, .4))
+      }
+    }
+
+    /* ---------------- 7. responsive & motion ---------------- */
+    .site-foot {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 1vh 4vw 5vh;
+      color: rgba(255, 255, 255, .3);
+      font-size: .7rem;
+      letter-spacing: .3em;
+      text-transform: uppercase
+    }
+
+    @media (max-width:1020px) {
+      .flower-card {
+        width: min(92vw, 560px)
+      }
+    }
+
+    @media (max-width:640px) {
+      .flower-card {
+        width: min(92vw, 430px);
+        min-height: 0
+      }
+
+      .nav-btn {
+        width: 46px;
+        height: 46px;
+        font-size: 1.35rem
+      }
+
+      .stage-dots {
+        gap: 11px
+      }
+
+      .site-head {
+        padding-top: 6vh
+      }
+
+      .title {
+        font-size: clamp(2.2rem, 10vw, 3rem)
+      }
+
+      .subtitle {
+        font-size: .8rem;
+        letter-spacing: .08em
+      }
+
+      .hint {
+        font-size: .62rem;
+        letter-spacing: .22em
+      }
+
+      .fl-name {
+        font-size: .85rem;
+        letter-spacing: .34em;
+        padding-left: .34em
+      }
+
+      .fl-sub {
+        font-size: .92rem
+      }
+
+      .fl-emoji {
+        font-size: 1.2rem
+      }
+
+      /* blossoms fill more of the card on small screens */
+      #rose .flower-live,
+      #lily .flower-live,
+      #sunflower .flower-live {
+        scale: 1.3
+      }
+
+      #rose .flower-hover,
+      #lily .flower-hover,
+      #sunflower .flower-hover {
+        translate: 0 -40px
+      }
+    }
+
+    /* touch devices have no hover — keep names visible once bloomed */
+    @media (hover:none) {
+      .flower-card.bloomed .flower-label {
+        opacity: 1;
+        transform: translate(-50%, 0)
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+
+      .arc,
+      .loop,
+      .node,
+      .spark,
+      .sweep-bar,
+      .flower-live,
+      .flower-hover,
+      .halo,
+      .core-glow,
+      .title {
+        animation: none !important
+      }
+
+      .petal {
+        --dur: .7s
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- atmospheric layers -->
-<div class="noise" aria-hidden="true"></div>
-<div class="vignette" aria-hidden="true"></div>
-<canvas id="fx" aria-hidden="true"></canvas>
+  <!-- atmospheric layers -->
+  <div class="noise" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <canvas id="fx" aria-hidden="true"></canvas>
 
-<!-- ============================================================
+  <!-- ============================================================
      SHARED SVG DEFS — every gradient & filter used by the flowers.
      One hidden SVG keeps the flower markup lean; url(#id) resolves
      across the whole document.
      ============================================================ -->
-<svg id="assets" width="0" height="0" aria-hidden="true" style="position:absolute">
-  <defs>
-    <!-- reusable glow filters (feGaussianBlur + merge) -->
-    <filter id="fGlow" x="-120%" y="-120%" width="340%" height="340%">
-      <feGaussianBlur stdDeviation="3.5" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
+  <svg id="assets" width="0" height="0" aria-hidden="true" style="position:absolute">
+    <defs>
+      <!-- reusable glow filters (feGaussianBlur + merge) -->
+      <filter id="fGlow" x="-120%" y="-120%" width="340%" height="340%">
+        <feGaussianBlur stdDeviation="3.5" result="b" />
+        <feMerge>
+          <feMergeNode in="b" />
+          <feMergeNode in="b" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
 
-    <!-- ==================== ROSE ==================== -->
-    <radialGradient id="roseHalo">
-      <stop offset="0" stop-color="#ff2e6e" stop-opacity=".6"/>
-      <stop offset=".5" stop-color="#ff2e6e" stop-opacity=".22"/>
-      <stop offset="1" stop-color="#ff2e6e" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="rCore">
-      <stop offset="0" stop-color="#fff0f5"/>
-      <stop offset=".4" stop-color="#ffb3cd"/>
-      <stop offset="1" stop-color="#ff8fb3" stop-opacity="0"/>
-    </radialGradient>
-    <!-- petal gradients: deep crimson outside -> pale pink inside -->
-    <linearGradient id="rg0" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#2e020a"/><stop offset=".5" stop-color="#660a29"/><stop offset="1" stop-color="#b01e4c"/>
-    </linearGradient>
-    <linearGradient id="rg1" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#3d0714"/><stop offset=".5" stop-color="#7c0d36"/><stop offset="1" stop-color="#cc3268"/>
-    </linearGradient>
-    <linearGradient id="rg2" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#520b22"/><stop offset=".5" stop-color="#96194a"/><stop offset="1" stop-color="#f25a92"/>
-    </linearGradient>
-    <linearGradient id="rg3" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#6d1234"/><stop offset=".5" stop-color="#bb3f72"/><stop offset="1" stop-color="#ffadd0"/>
-    </linearGradient>
-    <linearGradient id="rg4" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#a83e6b"/><stop offset=".5" stop-color="#f08cab"/><stop offset="1" stop-color="#ffe4ee"/>
-    </linearGradient>
-    <!-- back guard petals: darkest, sit behind everything -->
-    <linearGradient id="rgGuard" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#1f0106"/><stop offset=".5" stop-color="#4a0618"/><stop offset="1" stop-color="#8a1236"/>
-    </linearGradient>
-    <!-- inner cup shading shared by all rose petals -->
-    <linearGradient id="rShadow" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#1d0107" stop-opacity=".6"/>
-      <stop offset="1" stop-color="#1d0107" stop-opacity="0"/>
-    </linearGradient>
-    <!-- rim light along the top edge of each petal -->
-    <linearGradient id="rRim" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
-      <stop offset="1" stop-color="#ffd9e6" stop-opacity=".5"/>
-    </linearGradient>
+      <!-- ==================== ROSE ==================== -->
+      <radialGradient id="roseHalo">
+        <stop offset="0" stop-color="#ff2e6e" stop-opacity=".6" />
+        <stop offset=".5" stop-color="#ff2e6e" stop-opacity=".22" />
+        <stop offset="1" stop-color="#ff2e6e" stop-opacity="0" />
+      </radialGradient>
+      <radialGradient id="rCore">
+        <stop offset="0" stop-color="#fff0f5" />
+        <stop offset=".4" stop-color="#ffb3cd" />
+        <stop offset="1" stop-color="#ff8fb3" stop-opacity="0" />
+      </radialGradient>
+      <!-- petal gradients: deep crimson outside -> pale pink inside -->
+      <linearGradient id="rg0" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#2e020a" />
+        <stop offset=".5" stop-color="#660a29" />
+        <stop offset="1" stop-color="#b01e4c" />
+      </linearGradient>
+      <linearGradient id="rg1" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#3d0714" />
+        <stop offset=".5" stop-color="#7c0d36" />
+        <stop offset="1" stop-color="#cc3268" />
+      </linearGradient>
+      <linearGradient id="rg2" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#520b22" />
+        <stop offset=".5" stop-color="#96194a" />
+        <stop offset="1" stop-color="#f25a92" />
+      </linearGradient>
+      <linearGradient id="rg3" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#6d1234" />
+        <stop offset=".5" stop-color="#bb3f72" />
+        <stop offset="1" stop-color="#ffadd0" />
+      </linearGradient>
+      <linearGradient id="rg4" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#a83e6b" />
+        <stop offset=".5" stop-color="#f08cab" />
+        <stop offset="1" stop-color="#ffe4ee" />
+      </linearGradient>
+      <!-- back guard petals: darkest, sit behind everything -->
+      <linearGradient id="rgGuard" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#1f0106" />
+        <stop offset=".5" stop-color="#4a0618" />
+        <stop offset="1" stop-color="#8a1236" />
+      </linearGradient>
+      <!-- inner cup shading shared by all rose petals -->
+      <linearGradient id="rShadow" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#1d0107" stop-opacity=".6" />
+        <stop offset="1" stop-color="#1d0107" stop-opacity="0" />
+      </linearGradient>
+      <!-- rim light along the top edge of each petal -->
+      <linearGradient id="rRim" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity="0" />
+        <stop offset="1" stop-color="#ffd9e6" stop-opacity=".5" />
+      </linearGradient>
 
-    <!-- ==================== LILY ==================== -->
-    <radialGradient id="lilyHalo">
-      <stop offset="0" stop-color="#b07bff" stop-opacity=".55"/>
-      <stop offset=".5" stop-color="#b07bff" stop-opacity=".2"/>
-      <stop offset="1" stop-color="#b07bff" stop-opacity="0"/>
-    </radialGradient>
-    <!-- translucent glass petals: warm white base -> lavender tips -->
-    <radialGradient id="lgOuter" cx=".5" cy=".95" r=".95">
-      <stop offset="0" stop-color="#fffaf6"/><stop offset=".4" stop-color="#ffeef4"/>
-      <stop offset=".78" stop-color="#f0d5f5"/><stop offset="1" stop-color="#c2a3ea"/>
-    </radialGradient>
-    <radialGradient id="lgInner" cx=".5" cy=".95" r=".95">
-      <stop offset="0" stop-color="#fff3f7"/><stop offset=".5" stop-color="#ffd9e8"/><stop offset="1" stop-color="#d3b0f2"/>
-    </radialGradient>
-    <!-- back petals: cooler, more shadowed glass -->
-    <radialGradient id="lgBack" cx=".5" cy=".95" r=".95">
-      <stop offset="0" stop-color="#f6ecf9"/><stop offset=".5" stop-color="#e3d2f2"/><stop offset="1" stop-color="#b193dd"/>
-    </radialGradient>
-    <!-- dorsal vein stripe running up each petal -->
-    <linearGradient id="lDorsal" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#e8b4d8" stop-opacity="0"/>
-      <stop offset=".5" stop-color="#e8b4d8" stop-opacity=".35"/>
-      <stop offset="1" stop-color="#fff" stop-opacity=".55"/>
-    </linearGradient>
-    <linearGradient id="lShadow" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#8a6db8" stop-opacity=".45"/>
-      <stop offset="1" stop-color="#8a6db8" stop-opacity="0"/>
-    </linearGradient>
-    <radialGradient id="lgCenter">
-      <stop offset="0" stop-color="#fff6cf"/><stop offset=".55" stop-color="#f4c05a"/><stop offset="1" stop-color="#9a6a12"/>
-    </radialGradient>
-    <linearGradient id="lilySweep" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
-      <stop offset=".5" stop-color="#fff" stop-opacity=".5"/>
-      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-    </linearGradient>
+      <!-- ==================== LILY (oriental) ==================== -->
+      <radialGradient id="lilyHalo">
+        <stop offset="0" stop-color="#ff4fa3" stop-opacity=".55" />
+        <stop offset=".5" stop-color="#ff4fa3" stop-opacity=".2" />
+        <stop offset="1" stop-color="#ff4fa3" stop-opacity="0" />
+      </radialGradient>
+      <!-- bold magenta petals: deep magenta throat -> bright pink -> white rim -->
+      <radialGradient id="lgOuter" cx=".5" cy=".95" r=".95">
+        <stop offset="0" stop-color="#d6186f" />
+        <stop offset=".38" stop-color="#f43fa0" />
+        <stop offset=".72" stop-color="#ff8ec6" />
+        <stop offset="1" stop-color="#fff6fb" />
+      </radialGradient>
+      <radialGradient id="lgInner" cx=".5" cy=".95" r=".95">
+        <stop offset="0" stop-color="#c40f63" />
+        <stop offset=".42" stop-color="#ee2f92" />
+        <stop offset=".75" stop-color="#ff7fbd" />
+        <stop offset="1" stop-color="#fff0f7" />
+      </radialGradient>
+      <!-- back petals: deeper, shadowed magenta -->
+      <radialGradient id="lgBack" cx=".5" cy=".95" r=".95">
+        <stop offset="0" stop-color="#7d0839" />
+        <stop offset=".5" stop-color="#b3124f" />
+        <stop offset="1" stop-color="#e8548f" />
+      </radialGradient>
+      <!-- dorsal vein stripe running up each petal -->
+      <linearGradient id="lDorsal" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#ad0a4d" stop-opacity="0" />
+        <stop offset=".5" stop-color="#c2135c" stop-opacity=".4" />
+        <stop offset="1" stop-color="#fff" stop-opacity=".55" />
+      </linearGradient>
+      <linearGradient id="lShadow" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#6e0233" stop-opacity=".5" />
+        <stop offset="1" stop-color="#6e0233" stop-opacity="0" />
+      </linearGradient>
+      <radialGradient id="lgCenter">
+        <stop offset="0" stop-color="#f6f7d8" />
+        <stop offset=".55" stop-color="#d6e07c" />
+        <stop offset="1" stop-color="#7a8a26" />
+      </radialGradient>
+      <linearGradient id="lilySweep" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity="0" />
+        <stop offset=".5" stop-color="#fff" stop-opacity=".5" />
+        <stop offset="1" stop-color="#fff" stop-opacity="0" />
+      </linearGradient>
 
-    <!-- ==================== SUNFLOWER ==================== -->
-    <radialGradient id="sunHalo">
-      <stop offset="0" stop-color="#ffb703" stop-opacity=".55"/>
-      <stop offset=".5" stop-color="#ffb703" stop-opacity=".2"/>
-      <stop offset="1" stop-color="#ffb703" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="sgOuter" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#8f4207"/><stop offset=".4" stop-color="#f59e0b"/><stop offset="1" stop-color="#ffe27a"/>
-    </linearGradient>
-    <linearGradient id="sgInner" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#7a3805"/><stop offset=".4" stop-color="#e88f0c"/><stop offset="1" stop-color="#ffd23f"/>
-    </linearGradient>
-    <linearGradient id="sgBack" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#6b3005"/><stop offset=".45" stop-color="#c47708"/><stop offset="1" stop-color="#e8a824"/>
-    </linearGradient>
-    <radialGradient id="sgCore">
-      <stop offset="0" stop-color="#ffd23f" stop-opacity=".5"/>
-      <stop offset=".6" stop-color="#ffb703" stop-opacity=".22"/>
-      <stop offset="1" stop-color="#ffb703" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="sgDisc">
-      <stop offset="0" stop-color="#120801"/><stop offset=".55" stop-color="#1f0d03"/>
-      <stop offset=".85" stop-color="#381c07"/><stop offset="1" stop-color="#5c3410"/>
-    </radialGradient>
-    <linearGradient id="sgRim" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#8a5a1e"/><stop offset=".5" stop-color="#e8b23c"/><stop offset="1" stop-color="#8a5a1e"/>
-    </linearGradient>
+      <!-- ==================== SUNFLOWER ==================== -->
+      <radialGradient id="sunHalo">
+        <stop offset="0" stop-color="#ffb703" stop-opacity=".55" />
+        <stop offset=".5" stop-color="#ffb703" stop-opacity=".2" />
+        <stop offset="1" stop-color="#ffb703" stop-opacity="0" />
+      </radialGradient>
+      <linearGradient id="sgOuter" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#8f4207" />
+        <stop offset=".4" stop-color="#f59e0b" />
+        <stop offset="1" stop-color="#ffe27a" />
+      </linearGradient>
+      <linearGradient id="sgInner" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#7a3805" />
+        <stop offset=".4" stop-color="#e88f0c" />
+        <stop offset="1" stop-color="#ffd23f" />
+      </linearGradient>
+      <linearGradient id="sgBack" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#6b3005" />
+        <stop offset=".45" stop-color="#c47708" />
+        <stop offset="1" stop-color="#e8a824" />
+      </linearGradient>
+      <radialGradient id="sgCore">
+        <stop offset="0" stop-color="#ffd23f" stop-opacity=".5" />
+        <stop offset=".6" stop-color="#ffb703" stop-opacity=".22" />
+        <stop offset="1" stop-color="#ffb703" stop-opacity="0" />
+      </radialGradient>
+      <radialGradient id="sgDisc">
+        <stop offset="0" stop-color="#120801" />
+        <stop offset=".55" stop-color="#1f0d03" />
+        <stop offset=".85" stop-color="#381c07" />
+        <stop offset="1" stop-color="#5c3410" />
+      </radialGradient>
+      <linearGradient id="sgRim" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#8a5a1e" />
+        <stop offset=".5" stop-color="#e8b23c" />
+        <stop offset="1" stop-color="#8a5a1e" />
+      </linearGradient>
 
-    <!-- ============ SHARED PLANT ANATOMY (stem / leaves / sepals) ============ -->
-    <linearGradient id="stemGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#0e2a12"/><stop offset=".45" stop-color="#1e5c26"/>
-      <stop offset=".75" stop-color="#2e7a34"/><stop offset="1" stop-color="#123a16"/>
-    </linearGradient>
-    <linearGradient id="leafGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#0d2812"/><stop offset=".5" stop-color="#1f6b2b"/><stop offset="1" stop-color="#3a9a44"/>
-    </linearGradient>
-    <linearGradient id="leafVein" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="rgba(210,255,215,.0)"/><stop offset=".5" stop-color="rgba(210,255,215,.55)"/><stop offset="1" stop-color="rgba(210,255,215,0)"/>
-    </linearGradient>
-    <linearGradient id="sepalGrad" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#0c2410"/><stop offset=".6" stop-color="#1c5a24"/><stop offset="1" stop-color="#2f8a3a"/>
-    </linearGradient>
-  </defs>
-</svg>
+      <!-- ============ SHARED PLANT ANATOMY (stem / leaves / sepals) ============ -->
+      <linearGradient id="stemGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#0e2a12" />
+        <stop offset=".45" stop-color="#1e5c26" />
+        <stop offset=".75" stop-color="#2e7a34" />
+        <stop offset="1" stop-color="#123a16" />
+      </linearGradient>
+      <linearGradient id="leafGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#0d2812" />
+        <stop offset=".5" stop-color="#1f6b2b" />
+        <stop offset="1" stop-color="#3a9a44" />
+      </linearGradient>
+      <linearGradient id="leafVein" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="rgba(210,255,215,.0)" />
+        <stop offset=".5" stop-color="rgba(210,255,215,.55)" />
+        <stop offset="1" stop-color="rgba(210,255,215,0)" />
+      </linearGradient>
+      <linearGradient id="sepalGrad" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#0c2410" />
+        <stop offset=".6" stop-color="#1c5a24" />
+        <stop offset="1" stop-color="#2f8a3a" />
+      </linearGradient>
+    </defs>
+  </svg>
 
-<header class="site-head">
-  <h1 class="title">Programmer&rsquo;s Flowers</h1>
-  <p class="subtitle">Three luminous blossoms, grown line-by-line from pure SVG geometry</p>
-  <div class="divider" aria-hidden="true"><span class="line"></span><span class="bud"></span><span class="line r"></span></div>
-  <p class="hint">hover a flower &nbsp;&middot;&nbsp; click to bloom &nbsp;&middot;&nbsp; arrows to browse</p>
-</header>
+  <header class="site-head">
+    <h1 class="title">Programmer&rsquo;s Flowers</h1>
+    <p class="subtitle">Three luminous blossoms, grown line-by-line from pure SVG geometry</p>
+    <div class="divider" aria-hidden="true"><span class="line"></span><span class="bud"></span><span
+        class="line r"></span></div>
+    <p class="hint">hover a flower &nbsp;&middot;&nbsp; click to bloom &nbsp;&middot;&nbsp; arrows to browse</p>
+  </header>
 
-<!-- stage navigation: prev / dots / next -->
-<nav class="stage-nav" aria-label="Flower gallery navigation">
-  <button class="nav-btn" id="nav-prev" aria-label="Previous flower">&lsaquo;</button>
-  <div class="stage-dots" role="tablist">
-    <button class="dot active" data-goto="rose" role="tab" aria-label="Show rose"></button>
-    <button class="dot" data-goto="lily" role="tab" aria-label="Show lily"></button>
-    <button class="dot" data-goto="sun" role="tab" aria-label="Show sunflower"></button>
-  </div>
-  <button class="nav-btn" id="nav-next" aria-label="Next flower">&rsaquo;</button>
-</nav>
+  <!-- stage navigation: prev / dots / next -->
+  <nav class="stage-nav" aria-label="Flower gallery navigation">
+    <button class="nav-btn" id="nav-prev" aria-label="Previous flower">&lsaquo;</button>
+    <div class="stage-dots" role="tablist">
+      <button class="dot active" data-goto="rose" role="tab" aria-label="Show rose"></button>
+      <button class="dot" data-goto="lily" role="tab" aria-label="Show lily"></button>
+      <button class="dot" data-goto="sun" role="tab" aria-label="Show sunflower"></button>
+    </div>
+    <button class="nav-btn" id="nav-next" aria-label="Next flower">&rsaquo;</button>
+  </nav>
 
-<main class="garden">
+  <main class="garden">
 
-  <!-- ============================================================
+    <!-- ============================================================
        FLOWER 1 — ROSE  (Passion)
        39 overlapping petals in 6 rings + a tightly curled core.
        Outer petals: large, deep crimson. Inner rings shrink and
        pale toward a glowing pink heart.
        ============================================================ -->
-  <section class="flower-card" id="card-rose" data-flower="rose" tabindex="0" role="button"
-           aria-label="Rose, passion. Activate to bloom."
-           style="--accent:#ff4d7d;--glow:rgba(255,77,125,.45)">
-    <div class="card-glow" aria-hidden="true"></div>
-    <svg class="flower-svg" viewBox="-250 -250 500 500" aria-hidden="true" focusable="false">
-      <g class="decor"></g>
-      <circle class="halo" r="172" fill="url(#roseHalo)" style="animation-duration:6.5s"/>
-      <circle class="halo-boost" r="150" fill="url(#roseHalo)"/>
-      <g id="rose" class="flower">
-        <g class="plant"></g>
-        <g class="flower-hover">
-          <g class="flower-live" style="animation-duration:8.5s">
-            <g class="petals"></g>
-            <g class="core"></g>
+    <section class="flower-card" id="card-rose" data-flower="rose" tabindex="0" role="button"
+      aria-label="Rose, passion. Activate to bloom." style="--accent:#ff4d7d;--glow:rgba(255,77,125,.45)">
+      <div class="card-glow" aria-hidden="true"></div>
+      <svg class="flower-svg" viewBox="-250 -250 500 500" aria-hidden="true" focusable="false">
+        <g class="decor"></g>
+        <circle class="halo" r="172" fill="url(#roseHalo)" style="animation-duration:6.5s" />
+        <circle class="halo-boost" r="150" fill="url(#roseHalo)" />
+        <g id="rose" class="flower">
+          <g class="plant"></g>
+          <g class="flower-hover">
+            <g class="flower-live" style="animation-duration:8.5s">
+              <g class="petals"></g>
+              <g class="core"></g>
+            </g>
           </g>
         </g>
-      </g>
-    </svg>
-    <div class="flower-label" aria-hidden="true">
-      <span class="fl-emoji">🌹</span>
-      <span class="fl-name">ROSE</span>
-      <span class="fl-sub">&ldquo;Passion&rdquo;</span>
-    </div>
-  </section>
+      </svg>
+      <div class="flower-label" aria-hidden="true">
+        <span class="fl-emoji">🌹</span>
+        <span class="fl-name">ROSE</span>
+        <span class="fl-sub">&ldquo;Passion&rdquo;</span>
+      </div>
+    </section>
 
-  <!-- ============================================================
-       FLOWER 2 — LILY  (Elegance)
-       6 large glass-like outer petals + 6 inner petals unfolding
-       from a bud, a golden heart, and long stamens that appear
-       only after the petals have opened. A soft light sweep
-       occasionally crosses the blossom.
+    <!-- ============================================================
+       FLOWER 2 — ORIENTAL LILY  (Elegance)
+       A grand six-pointed star: broad magenta petals with white
+       rims and ruffled, recurved edges, dark-pink speckles, and
+       long yellow-green stamens rising from a green-gold heart.
+       A soft light sweep occasionally crosses the blossom.
        ============================================================ -->
-  <section class="flower-card" id="card-lily" data-flower="lily" tabindex="0" role="button"
-           aria-label="Lily, elegance. Activate to bloom."
-           style="--accent:#c9a7ff;--glow:rgba(201,167,255,.42)">
-    <div class="card-glow" aria-hidden="true"></div>
-    <svg class="flower-svg" viewBox="-250 -250 500 500" aria-hidden="true" focusable="false">
-      <g class="decor"></g>
-      <circle class="halo" r="175" fill="url(#lilyHalo)" style="animation-duration:7.5s"/>
-      <circle class="halo-boost" r="152" fill="url(#lilyHalo)"/>
-      <g id="lily" class="flower">
-        <g class="plant"></g>
-        <g class="flower-hover">
-          <g class="flower-live" style="animation-duration:10s">
-            <g class="petals"></g>
-            <g class="core"></g>
+    <section class="flower-card" id="card-lily" data-flower="lily" tabindex="0" role="button"
+      aria-label="Oriental lily, elegance. Activate to bloom." style="--accent:#ff6bb5;--glow:rgba(255,107,181,.42)">
+      <div class="card-glow" aria-hidden="true"></div>
+      <svg class="flower-svg" viewBox="-250 -250 500 500" aria-hidden="true" focusable="false">
+        <g class="decor"></g>
+        <circle class="halo" r="175" fill="url(#lilyHalo)" style="animation-duration:7.5s" />
+        <circle class="halo-boost" r="152" fill="url(#lilyHalo)" />
+        <g id="lily" class="flower">
+          <g class="plant"></g>
+          <g class="flower-hover">
+            <g class="flower-live" style="animation-duration:10s">
+              <g class="petals"></g>
+              <g class="core"></g>
+            </g>
           </g>
         </g>
-      </g>
-      <!-- soft light sweep, clipped to the petal silhouette -->
-      <g class="sweep-wrap" clip-path="url(#lilyClip)">
-        <rect class="sweep-bar" x="-46" y="-250" width="92" height="500" fill="url(#lilySweep)"/>
-      </g>
-    </svg>
-    <div class="flower-label" aria-hidden="true">
-      <span class="fl-emoji">🌸</span>
-      <span class="fl-name">LILY</span>
-      <span class="fl-sub">&ldquo;Elegance&rdquo;</span>
-    </div>
-  </section>
+        <!-- soft light sweep, clipped to the petal silhouette -->
+        <g class="sweep-wrap" clip-path="url(#lilyClip)">
+          <rect class="sweep-bar" x="-46" y="-250" width="92" height="500" fill="url(#lilySweep)" />
+        </g>
+      </svg>
+      <div class="flower-label" aria-hidden="true">
+        <span class="fl-emoji">🌸</span>
+        <span class="fl-name">LILY</span>
+        <span class="fl-sub">&ldquo;Elegance&rdquo;</span>
+      </div>
+    </section>
 
-  <!-- ============================================================
+    <!-- ============================================================
        FLOWER 3 — SUNFLOWER  (Joy)
        57 golden ray petals in three jittered rings (no two
        match), dark sepals behind them, a warm glow hugging the
        disc, and 220+ seeds & florets on a true phyllotaxis
        spiral (golden angle 137.5°).
        ============================================================ -->
-  <section class="flower-card" id="card-sunflower" data-flower="sun" tabindex="0" role="button"
-           aria-label="Sunflower, joy. Activate to bloom."
-           style="--accent:#ffc94d;--glow:rgba(255,201,77,.42)">
-    <div class="card-glow" aria-hidden="true"></div>
-    <svg class="flower-svg" viewBox="-250 -250 500 500" aria-hidden="true" focusable="false">
-      <g class="decor"></g>
-      <circle class="halo" r="185" fill="url(#sunHalo)" style="animation-duration:5.5s"/>
-      <circle class="halo-boost" r="160" fill="url(#sunHalo)"/>
-      <g id="sunflower" class="flower">
-        <g class="plant"></g>
-        <g class="flower-hover">
-          <g class="flower-live" style="animation-duration:7.5s">
-            <g class="petals"></g>
-            <g class="core"></g>
+    <section class="flower-card" id="card-sunflower" data-flower="sun" tabindex="0" role="button"
+      aria-label="Sunflower, joy. Activate to bloom." style="--accent:#ffc94d;--glow:rgba(255,201,77,.42)">
+      <div class="card-glow" aria-hidden="true"></div>
+      <svg class="flower-svg" viewBox="-250 -250 500 500" aria-hidden="true" focusable="false">
+        <g class="decor"></g>
+        <circle class="halo" r="185" fill="url(#sunHalo)" style="animation-duration:5.5s" />
+        <circle class="halo-boost" r="160" fill="url(#sunHalo)" />
+        <g id="sunflower" class="flower">
+          <g class="plant"></g>
+          <g class="flower-hover">
+            <g class="flower-live" style="animation-duration:7.5s">
+              <g class="petals"></g>
+              <g class="core"></g>
+            </g>
           </g>
         </g>
-      </g>
-    </svg>
-    <div class="flower-label" aria-hidden="true">
-      <span class="fl-emoji">🌻</span>
-      <span class="fl-name">SUNFLOWER</span>
-      <span class="fl-sub">&ldquo;Joy&rdquo;</span>
-    </div>
-  </section>
+      </svg>
+      <div class="flower-label" aria-hidden="true">
+        <span class="fl-emoji">🌻</span>
+        <span class="fl-name">SUNFLOWER</span>
+        <span class="fl-sub">&ldquo;Joy&rdquo;</span>
+      </div>
+    </section>
 
-</main>
+  </main>
 
-<footer class="site-foot">hand-coded svg &middot; no images &middot; no frameworks</footer>
+  <footer class="site-foot">hand-coded svg &middot; no images &middot; no frameworks</footer>
 
-<script>
-(function(){
-'use strict';
-/* ============================================================
-   UTILITIES
-   ============================================================ */
-const NS='http://www.w3.org/2000/svg';
-const $ =(s,r)=>(r||document).querySelector(s);
-const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
-const rnd=(a,b)=>a+Math.random()*(b-a);
-const pick=a=>a[(Math.random()*a.length)|0];
-const TAU=Math.PI*2;
-/* create an SVG element with attributes, appended to a parent */
-function E(name,attrs,parent){
-  const e=document.createElementNS(NS,name);
-  if(attrs)for(const k in attrs)e.setAttribute(k,attrs[k]);
-  if(parent)parent.appendChild(e);
-  return e;
-}
-
-/* ============================================================
-   PETAL GEOMETRY — hand-drawn path data (local space: base at
-   the origin, petal grows upward along -Y)
-   ============================================================ */
-/* rose: broad, cupped, slightly ruffled bloom petal */
-const ROSE_MAIN='M 0 6 C -30 4 -52 -6 -56 -30 C -60 -54 -50 -76 -30 -86 C -12 -95 12 -95 30 -86 C 50 -76 60 -54 56 -30 C 52 -6 30 4 0 6 Z';
-/* rose: large ruffled outer guard petal (wider, wavier edge) */
-const ROSE_GUARD='M 0 8 C -40 6 -70 -8 -74 -36 C -78 -64 -62 -90 -38 -100 C -20 -108 -8 -96 0 -104 C 8 -96 20 -108 38 -100 C 62 -90 78 -64 74 -36 C 70 -8 40 6 0 8 Z';
-/* rose: darkest back guard, widest of all — the outer silhouette */
-const ROSE_BACK='M 0 10 C -48 8 -82 -10 -86 -42 C -90 -74 -70 -102 -44 -112 C -24 -120 -10 -106 0 -116 C 10 -106 24 -120 44 -112 C 70 -102 90 -74 86 -42 C 82 -10 48 8 0 10 Z';
-const ROSE_CUP ='M 0 2 C -22 0 -38 -8 -42 -26 C -46 -44 -38 -62 -24 -70 C -10 -77 10 -77 24 -70 C 38 -62 46 -44 42 -26 C 38 -8 22 0 0 2 Z';
-const ROSE_RIB ='M 0 -4 C -5 -28 -4 -58 0 -82';
-const ROSE_EDGE='M -30 -86 C -12 -95 12 -95 30 -86';
-const ROSE_GUARD_EDGE='M -38 -100 C -20 -108 -8 -96 0 -104 C 8 -96 20 -108 38 -100';
-const ROSE_BACK_EDGE='M -44 -112 C -24 -120 -10 -106 0 -116 C 10 -106 24 -120 44 -112';
-/* lily: long pointed translucent petal */
-const LILY_PETAL='M 0 0 C -16 -20 -27 -58 -19 -102 C -12 -134 -4 -154 0 -162 C 4 -154 12 -134 19 -102 C 27 -58 16 -20 0 0 Z';
-const LILY_CUP ='M 0 -2 C -10 -18 -17 -48 -12 -84 C -8 -112 -3 -128 0 -136 C 3 -128 8 -112 12 -84 C 17 -48 10 -18 0 -2 Z';
-const LILY_VEIN='M 0 -10 C -2 -42 -1 -92 0 -138';
-const LILY_SIDE_VEIN_L='M -2 -22 C -8 -44 -10 -70 -7 -96';
-const LILY_SIDE_VEIN_R='M 2 -22 C 8 -44 10 -70 7 -96';
-const LILY_EDGE='M -19 -102 C -12 -134 -4 -154 0 -162 M 19 -102 C 12 -134 4 -154 0 -162';
-/* sunflower: wide golden ray with pointed tip (base at origin, tip at -110).
-   Drawn past the disc edge via translate(0,-base) so the wide part
-   of the blade stays visible outside the disc. */
-const SUN_PETAL ='M 0 0 C -14 -8 -22 -34 -20 -62 C -18 -88 -8 -104 0 -110 C 8 -104 18 -88 20 -62 C 22 -34 14 -8 0 0 Z';
-const SUN_GROOVE='M 0 -8 C -1.5 -34 -1 -72 0 -102';   /* centre crease */
-const SUN_EDGE  ='M -20 -62 C -22 -34 -14 -8 0 0';    /* lit left edge */
-const SUN_TIP   ='M 0 -82 C -5 -94 -5 -103 0 -110 C 5 -103 5 -94 0 -82 Z';
-const SUN_SEPAL ='M 0 0 C -7 -6 -10 -22 -5 -38 C -2 -46 2 -46 5 -38 C 10 -22 7 -6 0 0 Z';
-
-/* ============================================================
-   ROSE SVG — six concentric rings of petals.
-   Rig transform per petal:  rotate(angle) translate(0,-off)
-   scale(s) rotate(flare)  — flare alternates sign so rings
-   swirl around the heart like a real rose.
-   ============================================================ */
-const ROSE_RINGS=[
-  /* n, offset, scale, flare, gradient, delay, opacity, edge-spark, shape */
-  {n:8, off:12, s:1.06, flare:18, grad:'rgGuard',d:1.70, po:.9,  spark:true , shape:'back' },
-  {n:10,off:10, s:1.04, flare:15, grad:'rg0',    d:1.50, po:.92, spark:true , shape:'guard'},
-  {n:9, off:7,  s:.87,  flare:12, grad:'rg1',    d:1.15, po:.93, spark:true , shape:'main' },
-  {n:8, off:5,  s:.70,  flare:9,  grad:'rg2',    d:.82,  po:.94, spark:true , shape:'main' },
-  {n:7, off:3,  s:.53,  flare:7,  grad:'rg3',    d:.50,  po:.95, spark:false, shape:'main' },
-  {n:6, off:2,  s:.40,  flare:5,  grad:'rg4',    d:.24,  po:.96, spark:false, shape:'main' },
-  {n:5, off:1,  s:.30,  flare:16, grad:'rg4',    d:.12,  po:1,   spark:false, shape:'main' },
-  {n:4, off:1,  s:.20,  flare:20, grad:'rg4',    d:.04,  po:1,   spark:false, shape:'main' },
-];
-const ROSE_SHAPES={
-  back :{d:ROSE_BACK , edge:ROSE_BACK_EDGE },
-  guard:{d:ROSE_GUARD, edge:ROSE_GUARD_EDGE},
-  main :{d:ROSE_MAIN , edge:ROSE_EDGE      },
-};
-function buildRose(){
-  const host=$('#rose .petals'), core=$('#rose .core');
-  ROSE_RINGS.forEach((ring,ri)=>{
-    const base=(ri*137.5)%360;                 /* golden-angle ring offset */
-    const sh=ROSE_SHAPES[ring.shape];
-    for(let j=0;j<ring.n;j++){
-      const a=base+j*360/ring.n+rnd(-3,3);     /* radial angle + jitter */
-      const s=(ring.s*rnd(.93,1.06)).toFixed(3);
-      const fl=(ring.flare*(j%2?-1:1)*rnd(.65,1.2)).toFixed(1);
-      const rig=E('g',{transform:`rotate(${a.toFixed(1)}) translate(0 ${-ring.off}) scale(${s}) rotate(${fl})`},host);
-      const p=E('g',{class:'petal'},rig);
-      const d=ring.d+rnd(0,.28);               /* staggered delay */
-      p.dataset.d=d.toFixed(2);
-      p.style.setProperty('--d',d.toFixed(2)+'s');
-      /* closed state: curled toward the heart */
-      p.style.setProperty('--p0',`rotate(${(-a*.85+rnd(-8,8)).toFixed(1)}deg) scale(.05)`);
-      p.style.setProperty('--po',ring.po);
-      E('path',{d:sh.d,fill:`url(#${ring.grad})`,stroke:'rgba(255,215,230,.25)','stroke-width':.8},p);
-      E('path',{d:ROSE_CUP,fill:'url(#rShadow)',opacity:.55},p);
-      E('path',{d:ROSE_RIB,fill:'none',stroke:'rgba(255,255,255,.22)','stroke-width':1.1,'stroke-linecap':'round'},p);
-      /* rim light along the petal's top edge */
-      E('path',{d:sh.edge,fill:'none',stroke:'url(#rRim)','stroke-width':1.6,'stroke-linecap':'round'},p);
-      if(ring.spark&&j%3===1){
-        const sp=E('path',{d:sh.edge,class:'spark',fill:'none'},p);
-        sp.style.animationDelay=(-rnd(0,3.4)).toFixed(2)+'s';
+  <script>
+    (function () {
+      'use strict';
+      /* ============================================================
+         UTILITIES
+         ============================================================ */
+      const NS = 'http://www.w3.org/2000/svg';
+      const $ = (s, r) => (r || document).querySelector(s);
+      const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+      const rnd = (a, b) => a + Math.random() * (b - a);
+      const pick = a => a[(Math.random() * a.length) | 0];
+      const TAU = Math.PI * 2;
+      /* create an SVG element with attributes, appended to a parent */
+      function E(name, attrs, parent) {
+        const e = document.createElementNS(NS, name);
+        if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
+        if (parent) parent.appendChild(e);
+        return e;
       }
-      /* dew drops: glass beads clinging to the outer petals */
-      if(ri<3&&j%2===0){
-        const dx=rnd(-38,38), dy=-rnd(30,80);
-        const dr=rnd(1.6,3.2);
-        const g=E('g',{class:'dew',transform:`translate(${dx.toFixed(1)} ${dy.toFixed(1)})`},p);
-        E('ellipse',{rx:dr.toFixed(1),ry:(dr*1.15).toFixed(1),fill:'rgba(255,255,255,.28)',
-          stroke:'rgba(255,255,255,.5)','stroke-width':.5},g);
-        E('circle',{cx:(-dr*.3).toFixed(1),cy:(-dr*.4).toFixed(1),r:(dr*.28).toFixed(1),fill:'rgba(255,255,255,.95)'},g);
-      }
-    }
-  });
-  /* glowing heart: breathing core + spiral of tiny curled petals */
-  E('circle',{class:'core-glow',r:30,fill:'url(#rCore)'},core);
-  const heart=E('g',{class:'petal'},core);
-  heart.dataset.d=0;heart.style.setProperty('--d','0s');
-  heart.style.setProperty('--p0','scale(.05)');
-  /* phyllotaxis spiral of miniature petals — the rose's eye */
-  for(let i=0;i<26;i++){
-    const t=i*2.39996;                          /* golden angle */
-    const r=2+2.6*Math.sqrt(i);
-    if(r>15)break;
-    const x=Math.cos(t)*r, y=Math.sin(t)*r;
-    const rot=t*180/Math.PI+rnd(-14,14);
-    const s=(.32+r/15*.22)*rnd(.85,1.15);
-    const g=E('g',{transform:`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(0)}) scale(${s.toFixed(2)})`},heart);
-    E('path',{d:'M 0 1 C -8 -1 -12 -8 -9 -15 C -6 -21 6 -21 9 -15 C 12 -8 8 -1 0 1 Z',
-      fill:i%2?'#ffd9e8':'#ffe9f1',stroke:'rgba(255,255,255,.45)','stroke-width':.6},g);
-  }
-  /* two larger curled petals framing the spiral eye */
-  const curl=E('g',{class:'petal'},core);
-  curl.dataset.d=.1;curl.style.setProperty('--d','.1s');
-  curl.style.setProperty('--p0','rotate(40deg) scale(.05)');
-  E('path',{d:'M -9 1 C -15 -5 -14 -16 -5 -21 C 4 -25 13 -18 11 -9 C 9 -2 2 2 -4 1 Z',
-    fill:'#ffe7f0',stroke:'rgba(255,255,255,.55)','stroke-width':.7},curl);
-  E('path',{d:'M -5 -7 C -2 -13 4 -14 8 -10',fill:'none',stroke:'rgba(255,110,160,.85)',
-    'stroke-width':1.3,'stroke-linecap':'round'},curl);
-  const curl2=E('g',{class:'petal'},core);
-  curl2.dataset.d=.15;curl2.style.setProperty('--d','.15s');
-  curl2.style.setProperty('--p0','rotate(-40deg) scale(.05)');
-  E('path',{d:'M 9 1 C 15 -5 14 -16 5 -21 C -4 -25 -13 -18 -11 -9 C -9 -2 -2 2 4 1 Z',
-    fill:'#ffd9e8',stroke:'rgba(255,255,255,.5)','stroke-width':.7},curl2);
-  E('path',{d:'M 5 -7 C 2 -13 -4 -14 -8 -10',fill:'none',stroke:'rgba(255,110,160,.85)',
-    'stroke-width':1.3,'stroke-linecap':'round'},curl2);
-}
 
-/* ============================================================
-   LILY SVG — three whorls of glass petals (back shadowed whorl,
-   outer + inner translucent whorls) that unfold from a bud, then
-   stamens and a pistil emerge. A light sweep occasionally crosses
-   the blossom.
-   ============================================================ */
-function buildLily(){
-  const host=$('#lily .petals'), core=$('#lily .core');
-  const clip=E('clipPath',{id:'lilyClip'},$('#assets defs'));
-  const geo=[];                                /* petal placements for the sweep clip */
-  const mk=(count,a0,scale,grad,d0,po,back)=>{
-    for(let j=0;j<count;j++){
-      const a=a0+j*360/count+rnd(-2.5,2.5);
-      const s=scale*rnd(.96,1.04);
-      geo.push({a,s});
-      const rig=E('g',{transform:`rotate(${a.toFixed(1)}) scale(${s.toFixed(3)})`},host);
-      const p=E('g',{class:'petal'},rig);
-      const d=d0+j*.07+rnd(0,.12);
-      p.dataset.d=d.toFixed(2);p.style.setProperty('--d',d.toFixed(2)+'s');
-      /* bud: petal rotated back toward the central axis */
-      p.style.setProperty('--p0',`rotate(${(-a*.92).toFixed(1)}deg) scale(.3)`);
-      p.style.setProperty('--po',po);
-      E('path',{d:LILY_PETAL,fill:`url(#${grad})`,stroke:'rgba(255,255,255,.5)','stroke-width':.8},p);
-      E('path',{d:LILY_CUP,fill:'url(#lShadow)',opacity:.45},p);
-      E('path',{d:LILY_VEIN,fill:'none',stroke:'rgba(255,255,255,.3)','stroke-width':1,'stroke-linecap':'round'},p);
-      if(!back){                               /* front petals get richer detail */
-        E('path',{d:LILY_PETAL,fill:'url(#lDorsal)',opacity:.5},p);   /* dorsal stripe */
-        E('path',{d:LILY_SIDE_VEIN_L,fill:'none',stroke:'rgba(255,255,255,.22)','stroke-width':.8,'stroke-linecap':'round'},p);
-        E('path',{d:LILY_SIDE_VEIN_R,fill:'none',stroke:'rgba(255,255,255,.22)','stroke-width':.8,'stroke-linecap':'round'},p);
+      /* ============================================================
+         PETAL GEOMETRY — hand-drawn path data (local space: base at
+         the origin, petal grows upward along -Y)
+         ============================================================ */
+      /* rose: broad, cupped, slightly ruffled bloom petal */
+      const ROSE_MAIN = 'M 0 6 C -30 4 -52 -6 -56 -30 C -60 -54 -50 -76 -30 -86 C -12 -95 12 -95 30 -86 C 50 -76 60 -54 56 -30 C 52 -6 30 4 0 6 Z';
+      /* rose: large ruffled outer guard petal (wider, wavier edge) */
+      const ROSE_GUARD = 'M 0 8 C -40 6 -70 -8 -74 -36 C -78 -64 -62 -90 -38 -100 C -20 -108 -8 -96 0 -104 C 8 -96 20 -108 38 -100 C 62 -90 78 -64 74 -36 C 70 -8 40 6 0 8 Z';
+      /* rose: darkest back guard, widest of all — the outer silhouette */
+      const ROSE_BACK = 'M 0 10 C -48 8 -82 -10 -86 -42 C -90 -74 -70 -102 -44 -112 C -24 -120 -10 -106 0 -116 C 10 -106 24 -120 44 -112 C 70 -102 90 -74 86 -42 C 82 -10 48 8 0 10 Z';
+      const ROSE_CUP = 'M 0 2 C -22 0 -38 -8 -42 -26 C -46 -44 -38 -62 -24 -70 C -10 -77 10 -77 24 -70 C 38 -62 46 -44 42 -26 C 38 -8 22 0 0 2 Z';
+      const ROSE_RIB = 'M 0 -4 C -5 -28 -4 -58 0 -82';
+      const ROSE_EDGE = 'M -30 -86 C -12 -95 12 -95 30 -86';
+      const ROSE_GUARD_EDGE = 'M -38 -100 C -20 -108 -8 -96 0 -104 C 8 -96 20 -108 38 -100';
+      const ROSE_BACK_EDGE = 'M -44 -112 C -24 -120 -10 -106 0 -116 C 10 -106 24 -120 44 -112';
+      /* oriental lily: broad star petal with ruffled, recurved edges */
+      const LILY_PETAL = 'M 0 0 C -12 -10 -20 -26 -26 -40 C -30 -50 -36 -58 -33 -68 C -29 -76 -26 -84 -29 -92 C -33 -100 -39 -108 -36 -116 C -36 -124 -31 -130 -30 -138 C -27 -146 -22 -150 -16 -153 C -10 -156 -4 -158 0 -159 C 4 -158 10 -156 16 -153 C 22 -150 27 -146 30 -138 C 31 -130 36 -124 36 -116 C 39 -108 33 -100 29 -92 C 26 -84 29 -76 33 -68 C 36 -58 30 -50 26 -40 C 20 -26 12 -10 0 0 Z';
+      const LILY_CUP = 'M 0 -2 C -10 -16 -18 -40 -21 -64 C -23 -82 -20 -98 -23 -112 C -24 -124 -20 -136 -12 -144 C -7 -148 -3 -149 0 -150 C 3 -149 7 -148 12 -144 C 20 -136 24 -124 23 -112 C 20 -98 23 -82 21 -64 C 18 -40 10 -16 0 -2 Z';
+      const LILY_VEIN = 'M 0 -10 C -2 -44 -1 -96 0 -140';
+      const LILY_SIDE_VEIN_L = 'M -3 -22 C -12 -46 -16 -74 -12 -102';
+      const LILY_SIDE_VEIN_R = 'M 3 -22 C 12 -46 16 -74 12 -102';
+      const LILY_EDGE = 'M -33 -68 C -29 -76 -26 -84 -29 -92 C -33 -100 -39 -108 -36 -116 C -36 -124 -31 -130 -30 -138 C -27 -146 -22 -150 -16 -153 C -10 -156 -4 -158 0 -159 C 4 -158 10 -156 16 -153 C 22 -150 27 -146 30 -138 C 31 -130 36 -124 36 -116 C 39 -108 33 -100 29 -92 C 26 -84 29 -76 33 -68';
+      /* sunflower: wide golden ray with pointed tip (base at origin, tip at -110).
+         Drawn past the disc edge via translate(0,-base) so the wide part
+         of the blade stays visible outside the disc. */
+      const SUN_PETAL = 'M 0 0 C -14 -8 -22 -34 -20 -62 C -18 -88 -8 -104 0 -110 C 8 -104 18 -88 20 -62 C 22 -34 14 -8 0 0 Z';
+      const SUN_GROOVE = 'M 0 -8 C -1.5 -34 -1 -72 0 -102';   /* centre crease */
+      const SUN_EDGE = 'M -20 -62 C -22 -34 -14 -8 0 0';    /* lit left edge */
+      const SUN_TIP = 'M 0 -82 C -5 -94 -5 -103 0 -110 C 5 -103 5 -94 0 -82 Z';
+      const SUN_SEPAL = 'M 0 0 C -7 -6 -10 -22 -5 -38 C -2 -46 2 -46 5 -38 C 10 -22 7 -6 0 0 Z';
+
+      /* ============================================================
+         ROSE SVG — six concentric rings of petals.
+         Rig transform per petal:  rotate(angle) translate(0,-off)
+         scale(s) rotate(flare)  — flare alternates sign so rings
+         swirl around the heart like a real rose.
+         ============================================================ */
+      const ROSE_RINGS = [
+        /* n, offset, scale, flare, gradient, delay, opacity, edge-spark, shape */
+        { n: 8, off: 12, s: 1.06, flare: 18, grad: 'rgGuard', d: 1.70, po: .9, spark: true, shape: 'back' },
+        { n: 10, off: 10, s: 1.04, flare: 15, grad: 'rg0', d: 1.50, po: .92, spark: true, shape: 'guard' },
+        { n: 9, off: 7, s: .87, flare: 12, grad: 'rg1', d: 1.15, po: .93, spark: true, shape: 'main' },
+        { n: 8, off: 5, s: .70, flare: 9, grad: 'rg2', d: .82, po: .94, spark: true, shape: 'main' },
+        { n: 7, off: 3, s: .53, flare: 7, grad: 'rg3', d: .50, po: .95, spark: false, shape: 'main' },
+        { n: 6, off: 2, s: .40, flare: 5, grad: 'rg4', d: .24, po: .96, spark: false, shape: 'main' },
+        { n: 5, off: 1, s: .30, flare: 16, grad: 'rg4', d: .12, po: 1, spark: false, shape: 'main' },
+        { n: 4, off: 1, s: .20, flare: 20, grad: 'rg4', d: .04, po: 1, spark: false, shape: 'main' },
+      ];
+      const ROSE_SHAPES = {
+        back: { d: ROSE_BACK, edge: ROSE_BACK_EDGE },
+        guard: { d: ROSE_GUARD, edge: ROSE_GUARD_EDGE },
+        main: { d: ROSE_MAIN, edge: ROSE_EDGE },
+      };
+      function buildRose() {
+        const host = $('#rose .petals'), core = $('#rose .core');
+        ROSE_RINGS.forEach((ring, ri) => {
+          const base = (ri * 137.5) % 360;                 /* golden-angle ring offset */
+          const sh = ROSE_SHAPES[ring.shape];
+          for (let j = 0; j < ring.n; j++) {
+            const a = base + j * 360 / ring.n + rnd(-3, 3);     /* radial angle + jitter */
+            const s = (ring.s * rnd(.93, 1.06)).toFixed(3);
+            const fl = (ring.flare * (j % 2 ? -1 : 1) * rnd(.65, 1.2)).toFixed(1);
+            const rig = E('g', { transform: `rotate(${a.toFixed(1)}) translate(0 ${-ring.off}) scale(${s}) rotate(${fl})` }, host);
+            const p = E('g', { class: 'petal' }, rig);
+            const d = ring.d + rnd(0, .28);               /* staggered delay */
+            p.dataset.d = d.toFixed(2);
+            p.style.setProperty('--d', d.toFixed(2) + 's');
+            /* closed state: curled toward the heart */
+            p.style.setProperty('--p0', `rotate(${(-a * .85 + rnd(-8, 8)).toFixed(1)}deg) scale(.05)`);
+            p.style.setProperty('--po', ring.po);
+            E('path', { d: sh.d, fill: `url(#${ring.grad})`, stroke: 'rgba(255,215,230,.25)', 'stroke-width': .8 }, p);
+            E('path', { d: ROSE_CUP, fill: 'url(#rShadow)', opacity: .55 }, p);
+            E('path', { d: ROSE_RIB, fill: 'none', stroke: 'rgba(255,255,255,.22)', 'stroke-width': 1.1, 'stroke-linecap': 'round' }, p);
+            /* rim light along the petal's top edge */
+            E('path', { d: sh.edge, fill: 'none', stroke: 'url(#rRim)', 'stroke-width': 1.6, 'stroke-linecap': 'round' }, p);
+            if (ring.spark && j % 3 === 1) {
+              const sp = E('path', { d: sh.edge, class: 'spark', fill: 'none' }, p);
+
+              sp.style.animationDelay = (-rnd(0, 3.4)).toFixed(2) + 's';
+            }
+            /* dew drops: glass beads clinging to the outer petals */
+            if (ri < 3 && j % 2 === 0) {
+              const dx = rnd(-38, 38), dy = -rnd(30, 80);
+              const dr = rnd(1.6, 3.2);
+              const g = E('g', { class: 'dew', transform: `translate(${dx.toFixed(1)} ${dy.toFixed(1)})` }, p);
+              E('ellipse', {
+                rx: dr.toFixed(1), ry: (dr * 1.15).toFixed(1), fill: 'rgba(255,255,255,.28)',
+                stroke: 'rgba(255,255,255,.5)', 'stroke-width': .5
+              }, g);
+              E('circle', { cx: (-dr * .3).toFixed(1), cy: (-dr * .4).toFixed(1), r: (dr * .28).toFixed(1), fill: 'rgba(255,255,255,.95)' }, g);
+            }
+          }
+        });
+        /* glowing heart: breathing core + spiral of tiny curled petals */
+        E('circle', { class: 'core-glow', r: 30, fill: 'url(#rCore)' }, core);
+        const heart = E('g', { class: 'petal' }, core);
+        heart.dataset.d = 0; heart.style.setProperty('--d', '0s');
+        heart.style.setProperty('--p0', 'scale(.05)');
+        /* phyllotaxis spiral of miniature petals — the rose's eye */
+        for (let i = 0; i < 26; i++) {
+          const t = i * 2.39996;                          /* golden angle */
+          const r = 2 + 2.6 * Math.sqrt(i);
+          if (r > 15) break;
+          const x = Math.cos(t) * r, y = Math.sin(t) * r;
+          const rot = t * 180 / Math.PI + rnd(-14, 14);
+          const s = (.32 + r / 15 * .22) * rnd(.85, 1.15);
+          const g = E('g', { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(0)}) scale(${s.toFixed(2)})` }, heart);
+          E('path', {
+            d: 'M 0 1 C -8 -1 -12 -8 -9 -15 C -6 -21 6 -21 9 -15 C 12 -8 8 -1 0 1 Z',
+            fill: i % 2 ? '#ffd9e8' : '#ffe9f1', stroke: 'rgba(255,255,255,.45)', 'stroke-width': .6
+          }, g);
+        }
+        /* two larger curled petals framing the spiral eye */
+        const curl = E('g', { class: 'petal' }, core);
+        curl.dataset.d = .1; curl.style.setProperty('--d', '.1s');
+        curl.style.setProperty('--p0', 'rotate(40deg) scale(.05)');
+        E('path', {
+          d: 'M -9 1 C -15 -5 -14 -16 -5 -21 C 4 -25 13 -18 11 -9 C 9 -2 2 2 -4 1 Z',
+          fill: '#ffe7f0', stroke: 'rgba(255,255,255,.55)', 'stroke-width': .7
+        }, curl);
+        E('path', {
+          d: 'M -5 -7 C -2 -13 4 -14 8 -10', fill: 'none', stroke: 'rgba(255,110,160,.85)',
+          'stroke-width': 1.3, 'stroke-linecap': 'round'
+        }, curl);
+        const curl2 = E('g', { class: 'petal' }, core);
+        curl2.dataset.d = .15; curl2.style.setProperty('--d', '.15s');
+        curl2.style.setProperty('--p0', 'rotate(-40deg) scale(.05)');
+        E('path', {
+          d: 'M 9 1 C 15 -5 14 -16 5 -21 C -4 -25 -13 -18 -11 -9 C -9 -2 -2 2 4 1 Z',
+          fill: '#ffd9e8', stroke: 'rgba(255,255,255,.5)', 'stroke-width': .7
+        }, curl2);
+        E('path', {
+          d: 'M 5 -7 C 2 -13 -4 -14 -8 -10', fill: 'none', stroke: 'rgba(255,110,160,.85)',
+          'stroke-width': 1.3, 'stroke-linecap': 'round'
+        }, curl2);
       }
-      if(j%2===0){
-        const sp=E('path',{d:LILY_EDGE,class:'spark',fill:'none'},p);
-        sp.style.animationDelay=(-rnd(0,3.4)).toFixed(2)+'s';
+
+      /* ============================================================
+         ORIENTAL LILY SVG — three six-fold whorls (a shadowed back
+         star, the grand outer star, and an inner whorl) of broad
+         magenta petals with ruffled, recurved edges and white rims.
+         Dark-pink freckles dust the petals; long yellow-green
+         stamens and a pistil emerge after the bloom. A light sweep
+         occasionally crosses the blossom.
+         ============================================================ */
+      function buildLily() {
+        const host = $('#lily .petals'), core = $('#lily .core');
+        const clip = E('clipPath', { id: 'lilyClip' }, $('#assets defs'));
+        const geo = [];                                /* petal placements for the sweep clip */
+        const mk = (count, a0, scale, grad, d0, po, back, flare) => {
+          for (let j = 0; j < count; j++) {
+            const a = a0 + j * 360 / count + rnd(-2.5, 2.5);
+            const s = scale * rnd(.96, 1.04);
+            /* gentle consistent flare tips each petal outward — the
+               recurved, curving-away look of an oriental lily */
+            const fl = flare * rnd(.7, 1.2);
+            geo.push({ a, s, fl });
+            const rig = E('g', { transform: `rotate(${a.toFixed(1)}) scale(${s.toFixed(3)}) rotate(${fl.toFixed(1)})` }, host);
+            const p = E('g', { class: 'petal' }, rig);
+            const d = d0 + j * .07 + rnd(0, .12);
+            p.dataset.d = d.toFixed(2); p.style.setProperty('--d', d.toFixed(2) + 's');
+            /* bud: petal rotated back toward the central axis */
+            p.style.setProperty('--p0', `rotate(${(-a * .92).toFixed(1)}deg) scale(.3)`);
+            p.style.setProperty('--po', po);
+            E('path', { d: LILY_PETAL, fill: `url(#${grad})`, stroke: 'rgba(255,255,255,.62)', 'stroke-width': .9 }, p);
+            E('path', { d: LILY_CUP, fill: 'url(#lShadow)', opacity: .5 }, p);
+            E('path', { d: LILY_VEIN, fill: 'none', stroke: 'rgba(255,255,255,.3)', 'stroke-width': 1, 'stroke-linecap': 'round' }, p);
+            if (!back) {                               /* front petals get richer detail */
+              E('path', { d: LILY_PETAL, fill: 'url(#lDorsal)', opacity: .55 }, p);  /* dorsal stripe */
+              E('path', { d: LILY_SIDE_VEIN_L, fill: 'none', stroke: 'rgba(255,255,255,.22)', 'stroke-width': .8, 'stroke-linecap': 'round' }, p);
+              E('path', { d: LILY_SIDE_VEIN_R, fill: 'none', stroke: 'rgba(255,255,255,.22)', 'stroke-width': .8, 'stroke-linecap': 'round' }, p);
+            }
+            if (j % 2 === 0) {
+              const sp = E('path', { d: LILY_EDGE, class: 'spark', fill: 'none' }, p);
+              sp.style.animationDelay = (-rnd(0, 3.4)).toFixed(2) + 's';
+            }
+            /* freckles: the signature dark-pink speckles of an oriental lily */
+            if (!back) {
+              const fg = E('g', { class: 'freckle' }, p);
+              for (let f = 0; f < 11; f++) {
+                const fx = rnd(-20, 20), fy = -rnd(34, 120);
+                const fr = rnd(.8, 2);
+                E('circle', {
+                  cx: fx.toFixed(1), cy: fy.toFixed(1), r: fr.toFixed(1),
+                  fill: f % 3 ? 'rgba(168,16,92,.55)' : 'rgba(122,8,62,.68)'
+                }, fg);
+              }
+            }
+          }
+        };
+        mk(6, 30, 1.04, 'lgBack', .02, .9, true, 0);       /* shadowed back star unfolds first */
+        mk(6, 0, 1.14, 'lgOuter', .10, .93, false, 6);     /* grand outer star follows */
+        mk(6, 30, .9, 'lgInner', .55, .96, false, 4);      /* inner whorl completes the petals */
+        geo.forEach(g => E('path', { d: LILY_PETAL, transform: `rotate(${g.a.toFixed(1)}) scale(${g.s.toFixed(3)}) rotate(${g.fl.toFixed(1)})` }, clip));
+        /* green-gold heart */
+        E('circle', { class: 'core-glow', r: 26, fill: 'url(#lgCenter)' }, core);
+        /* long yellow-green stamens appear only after the petals have opened */
+        const st = E('g', { class: 'petal stamens' }, core);
+        st.dataset.d = 1.5; st.style.setProperty('--d', '1.5s');
+        st.style.setProperty('--p0', 'scale(.15) rotate(-14deg)');
+        for (let k = 0; k < 6; k++) {
+          const a = (k * 60 + 16) * Math.PI / 180;
+          const L = rnd(102, 128);
+          const ex = Math.sin(a) * L, ey = -Math.cos(a) * L - 16;
+          const cx = Math.sin(a) * L * .28, cy = -Math.cos(a) * L * .3 - 4;
+          E('path', {
+            d: `M 0 -6 Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`,
+            fill: 'none', stroke: '#b7d456', 'stroke-width': 1.8, 'stroke-linecap': 'round', opacity: .95
+          }, st);
+          const ang = Math.atan2(ey - cy, ex - cx) * 180 / Math.PI;
+          E('ellipse', {
+            cx: ex.toFixed(1), cy: ey.toFixed(1), rx: 3.4, ry: 7.4, fill: '#cfe072',
+            stroke: 'rgba(250,255,220,.85)', 'stroke-width': .6,
+            transform: `rotate(${ang.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)})`
+          }, st);
+        }
+        /* central pistil */
+        E('path', { d: 'M 0 -6 L 0 -128', fill: 'none', stroke: '#cfe39a', 'stroke-width': 2.2, 'stroke-linecap': 'round', opacity: .95 }, st);
+        E('ellipse', { cx: 0, cy: -133, rx: 4.2, ry: 8.5, fill: '#dceba6', stroke: 'rgba(255,255,240,.75)', 'stroke-width': .6 }, st);
+        /* pollen dust drifting around the anthers */
+        const pol = E('g', { class: 'pollen' }, st);
+        for (let q = 0; q < 16; q++) {
+          const a = rnd(0, TAU), r = rnd(24, 62);
+          E('circle', {
+            cx: (Math.cos(a) * r).toFixed(1), cy: (-Math.sin(a) * r * 1.1 - 70 + rnd(-16, 16)).toFixed(1),
+            r: rnd(.6, 1.5).toFixed(1), fill: q % 3 ? 'rgba(255,224,150,.7)' : 'rgba(235,245,180,.9)'
+          }, pol);
+        }
+        /* reveal the light sweep once geometry exists */
+        const sw = $('.sweep-wrap'); if (sw) sw.style.opacity = 1;
       }
-      /* freckles: the signature speckles on lily petals */
-      if(!back&&j%2===1){
-        const fg=E('g',{class:'freckle'},p);
-        for(let f=0;f<7;f++){
-          const fx=rnd(-13,13), fy=-rnd(38,105);
-          const fr=rnd(.7,1.7);
-          E('circle',{cx:fx.toFixed(1),cy:fy.toFixed(1),r:fr.toFixed(1),
-            fill:f%3?'rgba(200,80,140,.5)':'rgba(160,60,120,.6)'},fg);
+
+      /* ============================================================
+         SUNFLOWER SVG — three layered rings of golden rays (57 petals,
+         each jittered so no two match), dark sepals behind them, a
+         warm glow hugging the disc, and a disc carrying ~170 seeds on
+         a phyllotaxis spiral (golden angle 137.508°) plus a ring of
+         54 edge florets — all revealed in natural bloom order.
+         ============================================================ */
+      function buildSunflower() {
+        const host = $('#sunflower .petals'), core = $('#sunflower .core');
+
+        /* --- dark sepals: shadow teeth peeking from behind the rays --- */
+        const seps = E('g', null, host);
+        for (let j = 0; j < 26; j++) {
+          const a = j * 360 / 26 + 7 + rnd(-4, 4);
+          const rig = E('g', { transform: `rotate(${a.toFixed(1)}) translate(0 -72) scale(${rnd(.9, 1.12).toFixed(2)})` }, seps);
+          const p = E('g', { class: 'petal' }, rig);
+          p.dataset.d = 0; p.style.setProperty('--d', '0s');
+          p.style.setProperty('--p0', 'scale(.1)');
+          E('path', { d: SUN_SEPAL, fill: '#241304', stroke: 'rgba(190,130,50,.3)', 'stroke-width': .8 }, p);
+        }
+
+        /* --- three rings of golden rays, back to front --- */
+        const mk = (count, a0, base, scale, grad, d0, tip, spark) => {
+          for (let j = 0; j < count; j++) {
+            const a = a0 + j * 360 / count + rnd(-3.2, 3.2);   /* jitter: no two petals identical */
+            const s = scale * rnd(.95, 1.05);
+            const b = base + rnd(-4, 4);                 /* depth jitter: tips at varying radii */
+            const rig = E('g', { transform: `rotate(${a.toFixed(1)}) translate(0 ${-b.toFixed(1)}) scale(${s.toFixed(3)})` }, host);
+            const p = E('g', { class: 'petal' }, rig);
+            const d = d0 + j * .028 + rnd(0, .07);
+            p.dataset.d = d.toFixed(2); p.style.setProperty('--d', d.toFixed(2) + 's');
+            /* folded inward toward the centre */
+            p.style.setProperty('--p0', `rotate(${rnd(-24, -10).toFixed(1)}deg) scale(.08)`);
+            E('path', { d: SUN_PETAL, fill: `url(#${grad})`, stroke: 'rgba(120,60,0,.4)', 'stroke-width': .7 }, p);
+            E('path', { d: SUN_GROOVE, fill: 'none', stroke: 'rgba(90,40,0,.35)', 'stroke-width': 1.6, 'stroke-linecap': 'round' }, p);
+            E('path', { d: SUN_EDGE, fill: 'none', stroke: 'rgba(255,240,200,.4)', 'stroke-width': 1, 'stroke-linecap': 'round' }, p);
+            /* sheen: a bright streak along one side of the blade */
+            E('path', {
+              d: 'M 6 -14 C 10 -36 10 -66 5 -92', fill: 'none', class: 'sheen',
+              stroke: 'rgba(255,250,220,.5)', 'stroke-width': 2.2, 'stroke-linecap': 'round'
+            }, p);
+            if (tip) E('path', { d: SUN_TIP, fill: '#fff4c9', opacity: tip }, p);
+            if (spark && j % 3 === 1) {                      /* travelling glints on front blades */
+              const sp = E('path', { d: SUN_EDGE, class: 'spark', fill: 'none' }, p);
+              sp.style.animationDelay = (-rnd(0, 3.4)).toFixed(2) + 's';
+            }
+          }
+        };
+        mk(21, 0, 80, 1.06, 'sgBack', .05, 0, false);  /* deep back ring unfolds first */
+        mk(19, 9.5, 84, .98, 'sgInner', .35, .45, false);   /* mid ring follows */
+        mk(17, 4, 88, .92, 'sgOuter', .70, .85, true);    /* bright front ring completes the bloom */
+
+        /* --- warm glow hugging the disc edge (lifts it off the rays) --- */
+        E('circle', { class: 'core-glow', r: 112, fill: 'url(#sgCore)' }, core);
+
+        /* --- dark seed disc: golden rim + recessed texture bands --- */
+        const disc = E('g', { class: 'petal disc' }, core);
+        disc.dataset.d = .3; disc.style.setProperty('--d', '.3s');
+        disc.style.setProperty('--p0', 'scale(.5)');
+        E('circle', { r: 88, fill: 'url(#sgDisc)' }, disc);
+        E('circle', { r: 88, fill: 'none', stroke: 'url(#sgRim)', 'stroke-width': 2.6, opacity: .95 }, disc);
+        E('circle', { r: 80, fill: 'none', stroke: 'rgba(255,220,150,.14)', 'stroke-width': 7 }, disc);
+        E('circle', { r: 56, fill: 'none', stroke: 'rgba(0,0,0,.35)', 'stroke-width': 9, opacity: .45 }, disc);
+        E('circle', { r: 32, fill: 'none', stroke: 'rgba(0,0,0,.3)', 'stroke-width': 8, opacity: .45 }, disc);
+
+        /* --- seeds: phyllotaxis spiral in the heart (r ≤ 70) --- */
+        const seedHost = E('g', { class: 'seeds' }, core);
+        for (let i = 0; i < 170; i++) {
+          const t = i * 2.39996;                        /* golden angle in radians */
+          const r = 4 + 5.1 * Math.sqrt(i);
+          if (r > 70) break;
+          const x = Math.cos(t) * r, y = Math.sin(t) * r;
+          const size = 1.3 + (r / 70) * 1.5 + rnd(0, .3);
+          let fill = r < 28 ? '#20100a' : (i % 2 ? '#2b1607' : '#3f2409');
+          if (i % 13 === 0) fill = '#59371a';
+          if (i % 21 === 0) fill = '#c9902e';               /* golden flecks trace the spiral */
+          const c = E('circle', { class: 'seed', cx: x.toFixed(1), cy: y.toFixed(1), r: size.toFixed(2), fill }, seedHost);
+          const d = 1.15 + i * .007;                      /* progressive spiral reveal */
+          c.dataset.d = d.toFixed(3); c.style.setProperty('--d', d.toFixed(3) + 's');
+        }
+        /* --- ring of open florets around the disc edge (r 74–84) --- */
+        for (let i = 0; i < 54; i++) {
+          const t = i * 2.39996 + 1.9;
+          const r = 74 + (i % 3) * 4.5 + rnd(0, 1.5);
+          const x = Math.cos(t) * r, y = Math.sin(t) * r;
+          const size = 2 + (i % 3) * .5 + rnd(0, .4);
+          const fill = i % 4 === 0 ? '#c9902e' : (i % 2 ? '#4a2c0e' : '#33200b');
+          const c = E('circle', { class: 'seed', cx: x.toFixed(1), cy: y.toFixed(1), r: size.toFixed(2), fill }, seedHost);
+          const d = 1.02 + i * .006;                     /* florets open just before the heart */
+          c.dataset.d = d.toFixed(3); c.style.setProperty('--d', d.toFixed(3) + 's');
         }
       }
-    }
-  };
-  mk(6,30,.86,'lgBack',.02,.9,true);           /* shadowed back whorl unfolds first */
-  mk(8,0,1.02,'lgOuter',.10,.92,false);         /* outer whorl follows */
-  mk(8,22.5,.72,'lgInner',.55,.95,false);       /* inner whorl completes the petals */
-  geo.forEach(g=>E('path',{d:LILY_PETAL,transform:`rotate(${g.a.toFixed(1)}) scale(${g.s.toFixed(3)})`},clip));
-  /* golden heart */
-  E('circle',{class:'core-glow',r:22,fill:'url(#lgCenter)'},core);
-  /* stamens appear only after the petals have opened */
-  const st=E('g',{class:'petal stamens'},core);
-  st.dataset.d=1.5;st.style.setProperty('--d','1.5s');
-  st.style.setProperty('--p0','scale(.15) rotate(-14deg)');
-  for(let k=0;k<6;k++){
-    const a=(k*60+16)*Math.PI/180;
-    const L=rnd(78,96);
-    const ex=Math.sin(a)*L, ey=-Math.cos(a)*L-16;
-    const cx=Math.sin(a)*L*.28, cy=-Math.cos(a)*L*.3-4;
-    E('path',{d:`M 0 -6 Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`,
-      fill:'none',stroke:'#e6c78a','stroke-width':1.5,'stroke-linecap':'round',opacity:.95},st);
-    const ang=Math.atan2(ey-cy,ex-cx)*180/Math.PI;
-    E('ellipse',{cx:ex.toFixed(1),cy:ey.toFixed(1),rx:3.1,ry:6.8,fill:'#f6b93b',
-      stroke:'rgba(255,244,200,.8)','stroke-width':.6,
-      transform:`rotate(${ang.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)})`},st);
-  }
-  /* central pistil */
-  E('path',{d:'M 0 -6 L 0 -98',fill:'none',stroke:'#f0e0ff','stroke-width':2,'stroke-linecap':'round',opacity:.95},st);
-  E('ellipse',{cx:0,cy:-102,rx:3.6,ry:8,fill:'#e9d6ff',stroke:'rgba(255,255,255,.7)','stroke-width':.6},st);
-  /* pollen dust drifting around the anthers */
-  const pol=E('g',{class:'pollen'},st);
-  for(let q=0;q<14;q++){
-    const a=rnd(0,TAU), r=rnd(20,52);
-    E('circle',{cx:(Math.cos(a)*r).toFixed(1),cy:(-Math.cos(a)*r*1.4-40+rnd(-14,14)).toFixed(1),
-      r:rnd(.6,1.4).toFixed(1),fill:q%3?'rgba(255,220,140,.7)':'rgba(255,240,190,.9)'},pol);
-  }
-  /* reveal the light sweep once geometry exists */
-  const sw=$('.sweep-wrap');if(sw)sw.style.opacity=1;
-}
 
-/* ============================================================
-   SUNFLOWER SVG — three layered rings of golden rays (57 petals,
-   each jittered so no two match), dark sepals behind them, a
-   warm glow hugging the disc, and a disc carrying ~170 seeds on
-   a phyllotaxis spiral (golden angle 137.508°) plus a ring of
-   54 edge florets — all revealed in natural bloom order.
-   ============================================================ */
-function buildSunflower(){
-  const host=$('#sunflower .petals'), core=$('#sunflower .core');
-
-  /* --- dark sepals: shadow teeth peeking from behind the rays --- */
-  const seps=E('g',null,host);
-  for(let j=0;j<26;j++){
-    const a=j*360/26+7+rnd(-4,4);
-    const rig=E('g',{transform:`rotate(${a.toFixed(1)}) translate(0 -72) scale(${rnd(.9,1.12).toFixed(2)})`},seps);
-    const p=E('g',{class:'petal'},rig);
-    p.dataset.d=0;p.style.setProperty('--d','0s');
-    p.style.setProperty('--p0','scale(.1)');
-    E('path',{d:SUN_SEPAL,fill:'#241304',stroke:'rgba(190,130,50,.3)','stroke-width':.8},p);
-  }
-
-  /* --- three rings of golden rays, back to front --- */
-  const mk=(count,a0,base,scale,grad,d0,tip,spark)=>{
-    for(let j=0;j<count;j++){
-      const a=a0+j*360/count+rnd(-3.2,3.2);   /* jitter: no two petals identical */
-      const s=scale*rnd(.95,1.05);
-      const b=base+rnd(-4,4);                 /* depth jitter: tips at varying radii */
-      const rig=E('g',{transform:`rotate(${a.toFixed(1)}) translate(0 ${-b.toFixed(1)}) scale(${s.toFixed(3)})`},host);
-      const p=E('g',{class:'petal'},rig);
-      const d=d0+j*.028+rnd(0,.07);
-      p.dataset.d=d.toFixed(2);p.style.setProperty('--d',d.toFixed(2)+'s');
-      /* folded inward toward the centre */
-      p.style.setProperty('--p0',`rotate(${rnd(-24,-10).toFixed(1)}deg) scale(.08)`);
-      E('path',{d:SUN_PETAL,fill:`url(#${grad})`,stroke:'rgba(120,60,0,.4)','stroke-width':.7},p);
-      E('path',{d:SUN_GROOVE,fill:'none',stroke:'rgba(90,40,0,.35)','stroke-width':1.6,'stroke-linecap':'round'},p);
-      E('path',{d:SUN_EDGE,fill:'none',stroke:'rgba(255,240,200,.4)','stroke-width':1,'stroke-linecap':'round'},p);
-      /* sheen: a bright streak along one side of the blade */
-      E('path',{d:'M 6 -14 C 10 -36 10 -66 5 -92',fill:'none',class:'sheen',
-        stroke:'rgba(255,250,220,.5)','stroke-width':2.2,'stroke-linecap':'round'},p);
-      if(tip)E('path',{d:SUN_TIP,fill:'#fff4c9',opacity:tip},p);
-      if(spark&&j%3===1){                      /* travelling glints on front blades */
-        const sp=E('path',{d:SUN_EDGE,class:'spark',fill:'none'},p);
-        sp.style.animationDelay=(-rnd(0,3.4)).toFixed(2)+'s';
+      /* ============================================================
+         PLANT ANATOMY — stem, leaves and sepals shared by all three
+         flowers. The stem grows upward from the ground (stroke-dash
+         reveal), leaves unfold along it as the tip passes, and sepals
+         form a green calyx peeking below the blossom.
+         NOTE: each leaf/sepal is DOUBLE-WRAPPED — the OUTER <g> carries
+         the positioning transform attribute (CSS never overrides it),
+         while the INNER <g> carries the CSS bloom animation. A CSS
+         transform on the same element would discard the attribute and
+         collapse every leaf onto the blossom origin.
+         ============================================================ */
+      const LEAF_SHAPE = 'M 0 0 C 14 -5 34 -3 48 6 C 34 17 13 19 0 12 C -3 8 -3 4 0 0 Z';
+      const SEPAL_SHAPE = 'M 0 0 C -7 9 -6 22 0 33 C 6 22 7 9 0 0 Z';
+      function buildPlant(f) {
+        const host = $('.plant', f.group);
+        if (!host || host.childNodes.length) return;
+        const sun = f.key === 'sun';
+        const sway = f.key === 'lily' ? 10 : (sun ? 6 : 8);   /* stem curvature per species */
+        /* --- stem: grows upward from the ground toward the blossom --- */
+        E('path', {
+          class: 'stem', d: `M 0 218 C ${-sway} 160 ${sway} 100 0 40`,
+          fill: 'none', stroke: 'url(#stemGrad)', 'stroke-width': 7, 'stroke-linecap': 'round'
+        }, host);
+        /* --- leaves: several pairs unfolding up the stem, bottom first
+               (lower leaves are larger and more horizontal, upper leaves
+               smaller and tilted upward — like real growth) --- */
+        const spots = sun ? [[202, 1.12], [180, 1.01], [155, .9]]
+          : f.key === 'lily' ? [[200, 1.08], [172, .96], [143, .84], [112, .72]]
+            : [[198, 1.08], [168, .96], [138, .84], [108, .72]];
+        spots.forEach((sp, i) => {
+          const y = sp[0], s = sp[1];
+          const t = (218 - y) / 178;                      /* Bézier param at this height */
+          const x = 3 * sway * t * (1 - t) * (2 * t - 1);          /* stem's x at that height */
+          const side = i % 2 ? 1 : -1;                      /* alternate right / left */
+          const ang = 15 + 9 * i + rnd(-4, 4);               /* upper leaves tilt higher */
+          const outer = E('g', {
+            transform: `translate(${(x + side * 2).toFixed(1)} ${(y + rnd(-3, 3)).toFixed(1)}) `
+              + `scale(${side} 1) rotate(${(-ang).toFixed(1)}) scale(${(s * rnd(.94, 1.06)).toFixed(2)})`
+          }, host);
+          const inner = E('g', { class: 'leaf', style: `--d:${(0.6 + i * .22).toFixed(2)}s` }, outer);
+          E('path', { d: LEAF_SHAPE, fill: 'url(#leafGrad)', stroke: 'rgba(120,220,130,.25)', 'stroke-width': .8 }, inner);
+          E('path', { d: 'M 3 6 C 17 4 31 5 44 8', fill: 'none', stroke: 'url(#leafVein)', 'stroke-width': 1.2 }, inner);
+        });
+        /* --- sepals: a green calyx fanning below the blossom, long
+               enough to peek out from behind the petals --- */
+        const cfg = sun ? { n: 9, cy: 112, len: [75, 110], fan: 52 }
+          : f.key === 'lily' ? { n: 7, cy: 74, len: [60, 92], fan: 62 }
+            : { n: 7, cy: 68, len: [55, 85], fan: 58 };
+        for (let j = 0; j < cfg.n; j++) {
+          const a = -cfg.fan + 2 * cfg.fan * j / (cfg.n - 1) + rnd(-3, 3);
+          const L = rnd(cfg.len[0], cfg.len[1]);
+          const outer = E('g', {
+            transform: `translate(0 ${cfg.cy}) rotate(${a.toFixed(1)}) `
+              + `scale(${(0.55 + 0.45 * L / 33).toFixed(2)} ${(L / 33).toFixed(2)})`
+          }, host);
+          const inner = E('g', { class: 'sepal', style: `--d:${(1.3 + j * .06).toFixed(2)}s` }, outer);
+          E('path', { d: SEPAL_SHAPE, fill: 'url(#sepalGrad)', stroke: 'rgba(120,220,130,.2)', 'stroke-width': .7 }, inner);
+        }
       }
-    }
-  };
-  mk(21,0,  80,1.06,'sgBack', .05, 0,  false);  /* deep back ring unfolds first */
-  mk(19,9.5,84,.98, 'sgInner',.35,.45, false);   /* mid ring follows */
-  mk(17,4,  88,.92, 'sgOuter',.70,.85, true);    /* bright front ring completes the bloom */
 
-  /* --- warm glow hugging the disc edge (lifts it off the rays) --- */
-  E('circle',{class:'core-glow',r:112,fill:'url(#sgCore)'},core);
+      /* ============================================================
+         DECORATIVE ENERGY — thin arcs, flowing loops and glowing
+         nodes orbiting each flower (kept subtle; the flower stars).
+         ============================================================ */
+      function buildDecor(svg, accent) {
+        const decor = $('.decor', svg);
+        E('circle', { class: 'arc spin-a', r: 212, fill: 'none', stroke: accent, 'stroke-width': 1, 'stroke-dasharray': '3 16', opacity: .32 }, decor);
+        E('circle', { class: 'arc spin-b', r: 236, fill: 'none', stroke: accent, 'stroke-width': .8, 'stroke-dasharray': '1 11', opacity: .24 }, decor);
+        const loop = 'M -238 26 C -150 -152 150 -152 238 26 C 150 130 -150 130 -238 26';
+        const l1 = E('path', { class: 'loop flow', d: loop, fill: 'none', stroke: accent, 'stroke-width': 1, opacity: .16 }, decor);
+        l1.style.animationDelay = (-rnd(0, 17)).toFixed(1) + 's';
+        const g2 = E('g', { transform: 'rotate(64)' }, decor);
+        const l2 = E('path', { class: 'loop flow rev', d: loop, fill: 'none', stroke: accent, 'stroke-width': 1, opacity: .13 }, g2);
+        l2.style.animationDelay = (-rnd(0, 17)).toFixed(1) + 's';
+        const g3 = E('g', { transform: 'rotate(-52)' }, decor);
+        const l3 = E('path', { class: 'loop flow', d: loop, fill: 'none', stroke: accent, 'stroke-width': .8, opacity: .1 }, g3);
+        l3.style.animationDelay = (-rnd(0, 17)).toFixed(1) + 's';
+        [[-238, 26], [238, 26], [137, -67], [-137, 67], [0, -152], [0, 178]].forEach((pt, i) => {
+          const n = E('circle', {
+            class: 'node', cx: pt[0], cy: pt[1], r: 2.4, fill: '#fff', stroke: accent,
+            'stroke-width': 1, filter: 'url(#fGlow)'
+          }, decor);
+          n.style.animationDelay = (i * .55) + 's';
+        });
+      }
 
-  /* --- dark seed disc: golden rim + recessed texture bands --- */
-  const disc=E('g',{class:'petal disc'},core);
-  disc.dataset.d=.3;disc.style.setProperty('--d','.3s');
-  disc.style.setProperty('--p0','scale(.5)');
-  E('circle',{r:88,fill:'url(#sgDisc)'},disc);
-  E('circle',{r:88,fill:'none',stroke:'url(#sgRim)','stroke-width':2.6,opacity:.95},disc);
-  E('circle',{r:80,fill:'none',stroke:'rgba(255,220,150,.14)','stroke-width':7},disc);
-  E('circle',{r:56,fill:'none',stroke:'rgba(0,0,0,.35)','stroke-width':9,opacity:.45},disc);
-  E('circle',{r:32,fill:'none',stroke:'rgba(0,0,0,.3)','stroke-width':8,opacity:.45},disc);
+      /* ============================================================
+         BLOOM SYSTEM — reusable, easing-driven via CSS transitions.
+         bloomRose() / bloomLily() / bloomSunflower() open a flower;
+         rebloom() closes it quickly and reopens (click interaction).
+         ============================================================ */
+      const F = {
+        rose: {
+          key: 'rose', card: $('#card-rose'), svg: $('#card-rose .flower-svg'), group: $('#rose'),
+          build: buildRose, delay: 400, accent: '#ff6b9c', palette: [[255, 92, 138], [255, 158, 195], [226, 232, 255]]
+        },
+        lily: {
+          key: 'lily', card: $('#card-lily'), svg: $('#card-lily .flower-svg'), group: $('#lily'),
+          build: buildLily, delay: 1000, accent: '#ff6bb5', palette: [[255, 107, 181], [255, 158, 195], [226, 232, 255]]
+        },
+        sun: {
+          key: 'sun', card: $('#card-sunflower'), svg: $('#card-sunflower .flower-svg'), group: $('#sunflower'),
+          build: buildSunflower, delay: 1600, accent: '#ffc94d', palette: [[255, 209, 102], [255, 183, 3], [226, 232, 255]]
+        },
+      };
+      function setBloom(key) {
+        const f = F[key];
+        if (!f.built) { f.build(); f.built = true; f.nodes = $$('.petal,.seed', f.group); }
+        f.group.classList.add('bloomed');
+        f.card.classList.add('bloomed');
+      }
+      function bloomRose() { setBloom('rose') }
+      function bloomLily() { setBloom('lily') }
+      function bloomSunflower() { setBloom('sun') }
+      window.bloomRose = bloomRose; window.bloomLily = bloomLily; window.bloomSunflower = bloomSunflower;
 
-  /* --- seeds: phyllotaxis spiral in the heart (r ≤ 70) --- */
-  const seedHost=E('g',{class:'seeds'},core);
-  for(let i=0;i<170;i++){
-    const t=i*2.39996;                        /* golden angle in radians */
-    const r=4+5.1*Math.sqrt(i);
-    if(r>70)break;
-    const x=Math.cos(t)*r, y=Math.sin(t)*r;
-    const size=1.3+(r/70)*1.5+rnd(0,.3);
-    let fill=r<28?'#20100a':(i%2?'#2b1607':'#3f2409');
-    if(i%13===0)fill='#59371a';
-    if(i%21===0)fill='#c9902e';               /* golden flecks trace the spiral */
-    const c=E('circle',{class:'seed',cx:x.toFixed(1),cy:y.toFixed(1),r:size.toFixed(2),fill},seedHost);
-    const d=1.15+i*.007;                      /* progressive spiral reveal */
-    c.dataset.d=d.toFixed(3);c.style.setProperty('--d',d.toFixed(3)+'s');
-  }
-  /* --- ring of open florets around the disc edge (r 74–84) --- */
-  for(let i=0;i<54;i++){
-    const t=i*2.39996+1.9;
-    const r=74+(i%3)*4.5+rnd(0,1.5);
-    const x=Math.cos(t)*r, y=Math.sin(t)*r;
-    const size=2+(i%3)*.5+rnd(0,.4);
-    const fill=i%4===0?'#c9902e':(i%2?'#4a2c0e':'#33200b');
-    const c=E('circle',{class:'seed',cx:x.toFixed(1),cy:y.toFixed(1),r:size.toFixed(2),fill},seedHost);
-    const d=1.02+i*.006;                     /* florets open just before the heart */
-    c.dataset.d=d.toFixed(3);c.style.setProperty('--d',d.toFixed(3)+'s');
-  }
-}
+      /* compress per-petal delays for a quicker, playful re-bloom */
+      function setDelays(f, mult) {
+        f.nodes.forEach(el => {
+          const d = parseFloat(el.dataset.d || 0) || 0;
+          el.style.transitionDelay = (d * mult).toFixed(2) + 's';
+        });
+      }
+      function clearDelays(f) { f.nodes.forEach(el => { el.style.transitionDelay = ''; }); }
 
-/* ============================================================
-   PLANT ANATOMY — stem, leaves and sepals shared by all three
-   flowers. The stem grows upward from the ground (stroke-dash
-   reveal), leaves unfold along it as the tip passes, and sepals
-   form a green calyx peeking below the blossom.
-   NOTE: each leaf/sepal is DOUBLE-WRAPPED — the OUTER <g> carries
-   the positioning transform attribute (CSS never overrides it),
-   while the INNER <g> carries the CSS bloom animation. A CSS
-   transform on the same element would discard the attribute and
-   collapse every leaf onto the blossom origin.
-   ============================================================ */
-const LEAF_SHAPE='M 0 0 C 14 -5 34 -3 48 6 C 34 17 13 19 0 12 C -3 8 -3 4 0 0 Z';
-const SEPAL_SHAPE='M 0 0 C -7 9 -6 22 0 33 C 6 22 7 9 0 0 Z';
-function buildPlant(f){
-  const host=$('.plant',f.group);
-  if(!host||host.childNodes.length)return;
-  const sun=f.key==='sun';
-  const sway=f.key==='lily'?10:(sun?6:8);   /* stem curvature per species */
-  /* --- stem: grows upward from the ground toward the blossom --- */
-  E('path',{class:'stem',d:`M 0 218 C ${-sway} 160 ${sway} 100 0 40`,
-    fill:'none',stroke:'url(#stemGrad)','stroke-width':7,'stroke-linecap':'round'},host);
-  /* --- leaves: several pairs unfolding up the stem, bottom first
-         (lower leaves are larger and more horizontal, upper leaves
-         smaller and tilted upward — like real growth) --- */
-  const spots=sun?[[202,1.12],[180,1.01],[155,.9]]
-            :f.key==='lily'?[[200,1.08],[172,.96],[143,.84],[112,.72]]
-            :[[198,1.08],[168,.96],[138,.84],[108,.72]];
-  spots.forEach((sp,i)=>{
-    const y=sp[0],s=sp[1];
-    const t=(218-y)/178;                      /* Bézier param at this height */
-    const x=3*sway*t*(1-t)*(2*t-1);          /* stem's x at that height */
-    const side=i%2?1:-1;                      /* alternate right / left */
-    const ang=15+9*i+rnd(-4,4);               /* upper leaves tilt higher */
-    const outer=E('g',{transform:`translate(${(x+side*2).toFixed(1)} ${(y+rnd(-3,3)).toFixed(1)}) `
-      +`scale(${side} 1) rotate(${(-ang).toFixed(1)}) scale(${(s*rnd(.94,1.06)).toFixed(2)})`},host);
-    const inner=E('g',{class:'leaf',style:`--d:${(0.6+i*.22).toFixed(2)}s`},outer);
-    E('path',{d:LEAF_SHAPE,fill:'url(#leafGrad)',stroke:'rgba(120,220,130,.25)','stroke-width':.8},inner);
-    E('path',{d:'M 3 6 C 17 4 31 5 44 8',fill:'none',stroke:'url(#leafVein)','stroke-width':1.2},inner);
-  });
-  /* --- sepals: a green calyx fanning below the blossom, long
-         enough to peek out from behind the petals --- */
-  const cfg=sun?{n:9,cy:112,len:[75,110],fan:52}
-          :f.key==='lily'?{n:7,cy:74,len:[60,92],fan:62}
-          :{n:7,cy:68,len:[55,85],fan:58};
-  for(let j=0;j<cfg.n;j++){
-    const a=-cfg.fan+2*cfg.fan*j/(cfg.n-1)+rnd(-3,3);
-    const L=rnd(cfg.len[0],cfg.len[1]);
-    const outer=E('g',{transform:`translate(0 ${cfg.cy}) rotate(${a.toFixed(1)}) `
-      +`scale(${(0.55+0.45*L/33).toFixed(2)} ${(L/33).toFixed(2)})`},host);
-    const inner=E('g',{class:'sepal',style:`--d:${(1.3+j*.06).toFixed(2)}s`},outer);
-    E('path',{d:SEPAL_SHAPE,fill:'url(#sepalGrad)',stroke:'rgba(120,220,130,.2)','stroke-width':.7},inner);
-  }
-}
+      function rebloom(key) {
+        const f = F[key];
+        if (!f.built) { setBloom(key); return; }
+        f.card.classList.add('fast');
+        setDelays(f, .3);
+        f.group.classList.remove('bloomed');
+        void f.card.offsetWidth;                    /* flush styles so closing runs */
+        setTimeout(() => {
+          clearDelays(f);
+          f.group.classList.add('bloomed');
+          setTimeout(() => f.card.classList.remove('fast'), 1500);
+        }, 520);
+      }
 
-/* ============================================================
-   DECORATIVE ENERGY — thin arcs, flowing loops and glowing
-   nodes orbiting each flower (kept subtle; the flower stars).
-   ============================================================ */
-function buildDecor(svg,accent){
-  const decor=$('.decor',svg);
-  E('circle',{class:'arc spin-a',r:212,fill:'none',stroke:accent,'stroke-width':1,'stroke-dasharray':'3 16',opacity:.32},decor);
-  E('circle',{class:'arc spin-b',r:236,fill:'none',stroke:accent,'stroke-width':.8,'stroke-dasharray':'1 11',opacity:.24},decor);
-  const loop='M -238 26 C -150 -152 150 -152 238 26 C 150 130 -150 130 -238 26';
-  const l1=E('path',{class:'loop flow',d:loop,fill:'none',stroke:accent,'stroke-width':1,opacity:.16},decor);
-  l1.style.animationDelay=(-rnd(0,17)).toFixed(1)+'s';
-  const g2=E('g',{transform:'rotate(64)'},decor);
-  const l2=E('path',{class:'loop flow rev',d:loop,fill:'none',stroke:accent,'stroke-width':1,opacity:.13},g2);
-  l2.style.animationDelay=(-rnd(0,17)).toFixed(1)+'s';
-  const g3=E('g',{transform:'rotate(-52)'},decor);
-  const l3=E('path',{class:'loop flow',d:loop,fill:'none',stroke:accent,'stroke-width':.8,opacity:.1},g3);
-  l3.style.animationDelay=(-rnd(0,17)).toFixed(1)+'s';
-  [[-238,26],[238,26],[137,-67],[-137,67],[0,-152],[0,178]].forEach((pt,i)=>{
-    const n=E('circle',{class:'node',cx:pt[0],cy:pt[1],r:2.4,fill:'#fff',stroke:accent,
-      'stroke-width':1,filter:'url(#fGlow)'},decor);
-    n.style.animationDelay=(i*.55)+'s';
-  });
-}
+      /* ============================================================
+         PARTICLE SYSTEM — one lightweight canvas.
+         Ambient star-dust always drifts; bursts accompany clicks;
+         the sunflower breathes golden motes from its heart.
+         Glow sprites are pre-rendered once (cheap drawImage).
+         ============================================================ */
+      const cvs = $('#fx'), ctx = cvs.getContext('2d');
+      let W = 0, H = 0;
+      function resize() {
+        const d = Math.min(window.devicePixelRatio || 1, 2);
+        W = innerWidth; H = innerHeight;
+        cvs.width = W * d; cvs.height = H * d;
+        ctx.setTransform(d, 0, 0, d, 0, 0);
+      }
+      addEventListener('resize', resize); resize();
 
-/* ============================================================
-   BLOOM SYSTEM — reusable, easing-driven via CSS transitions.
-   bloomRose() / bloomLily() / bloomSunflower() open a flower;
-   rebloom() closes it quickly and reopens (click interaction).
-   ============================================================ */
-const F={
-  rose:{key:'rose',card:$('#card-rose'),svg:$('#card-rose .flower-svg'),group:$('#rose'),
-        build:buildRose,delay:400,accent:'#ff6b9c',palette:[[255,92,138],[255,158,195],[226,232,255]]},
-  lily:{key:'lily',card:$('#card-lily'),svg:$('#card-lily .flower-svg'),group:$('#lily'),
-        build:buildLily,delay:1000,accent:'#c9a7ff',palette:[[201,167,255],[226,232,255],[255,158,195]]},
-  sun :{key:'sun', card:$('#card-sunflower'),svg:$('#card-sunflower .flower-svg'),group:$('#sunflower'),
-        build:buildSunflower,delay:1600,accent:'#ffc94d',palette:[[255,209,102],[255,183,3],[226,232,255]]},
-};
-function setBloom(key){
-  const f=F[key];
-  if(!f.built){f.build();f.built=true;f.nodes=$$('.petal,.seed',f.group);}
-  f.group.classList.add('bloomed');
-  f.card.classList.add('bloomed');
-}
-function bloomRose(){setBloom('rose')}
-function bloomLily(){setBloom('lily')}
-function bloomSunflower(){setBloom('sun')}
-window.bloomRose=bloomRose;window.bloomLily=bloomLily;window.bloomSunflower=bloomSunflower;
+      const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const AMBIENT = RM ? 12 : (innerWidth < 700 ? 34 : 64);
+      const parts = []; let amb = 0;
 
-/* compress per-petal delays for a quicker, playful re-bloom */
-function setDelays(f,mult){f.nodes.forEach(el=>{
-  const d=parseFloat(el.dataset.d||0)||0;
-  el.style.transitionDelay=(d*mult).toFixed(2)+'s';});}
-function clearDelays(f){f.nodes.forEach(el=>{el.style.transitionDelay='';});}
+      /* pre-rendered radial glow sprite per colour */
+      const spriteCache = {};
+      function sprite(rgb) {
+        const key = rgb.join(',');
+        if (spriteCache[key]) return spriteCache[key];
+        const c = document.createElement('canvas'); c.width = c.height = 64;
+        const g = c.getContext('2d');
+        const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+        gr.addColorStop(0, 'rgba(255,255,255,.95)');
+        gr.addColorStop(.22, `rgba(${key},.85)`);
+        gr.addColorStop(.55, `rgba(${key},.28)`);
+        gr.addColorStop(1, `rgba(${key},0)`);
+        g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+        spriteCache[key] = c; return c;
+      }
+      const COL = {
+        white: [226, 232, 255], pink: [255, 158, 195], crimson: [255, 92, 138],
+        lav: [201, 167, 255], gold: [255, 209, 102], goldHot: [255, 183, 3]
+      };
 
-function rebloom(key){
-  const f=F[key];
-  if(!f.built){setBloom(key);return;}
-  f.card.classList.add('fast');
-  setDelays(f,.3);
-  f.group.classList.remove('bloomed');
-  void f.card.offsetWidth;                    /* flush styles so closing runs */
-  setTimeout(()=>{
-    clearDelays(f);
-    f.group.classList.add('bloomed');
-    setTimeout(()=>f.card.classList.remove('fast'),1500);
-  },520);
-}
+      function spawnAmbient() {
+        parts.push({
+          t: 'a', x: rnd(0, W), y: rnd(0, H), vy: rnd(6, 20), r: rnd(.5, 1.7),
+          ph: rnd(0, TAU), tw: rnd(.4, 1.6), sw: rnd(.2, .9), swA: rnd(4, 16), age: 0,
+          spr: sprite(pick([COL.white, COL.white, COL.white, COL.lav, COL.pink]))
+        });
+        amb++;
+      }
+      function burst(x, y, palette, n) {
+        n = Math.min(n || 26, 460 - parts.length);
+        for (let i = 0; i < n; i++) {
+          const a = rnd(0, TAU), sp = rnd(50, 240);
+          parts.push({
+            t: 'b', x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - rnd(0, 40),
+            r: rnd(.9, 2.4), age: 0, life: rnd(.7, 1.4), spr: sprite(pick(palette))
+          });
+        }
+      }
+      function emitGold(x, y) {
+        const a = rnd(0, TAU), sp = rnd(10, 34);
+        parts.push({
+          t: 'e', x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - rnd(4, 18),
+          r: rnd(1, 2.4), age: 0, life: rnd(1.8, 3), spr: sprite(Math.random() < .5 ? COL.gold : COL.goldHot)
+        });
+      }
+      /* falling petal: a tiny coloured sliver fluttering down from a flower */
+      function emitPetal(x, y, palette) {
+        parts.push({
+          t: 'p', x, y, vx: rnd(-14, 14), vy: rnd(8, 22), r: rnd(1.6, 3.4), age: 0,
+          life: rnd(4, 7), ph: rnd(0, TAU), sw: rnd(.8, 2), swA: rnd(18, 42),
+          spr: sprite(pick(palette))
+        });
+      }
+      for (let i = 0; i < AMBIENT; i++)spawnAmbient();
 
-/* ============================================================
-   PARTICLE SYSTEM — one lightweight canvas.
-   Ambient star-dust always drifts; bursts accompany clicks;
-   the sunflower breathes golden motes from its heart.
-   Glow sprites are pre-rendered once (cheap drawImage).
-   ============================================================ */
-const cvs=$('#fx'),ctx=cvs.getContext('2d');
-let W=0,H=0;
-function resize(){
-  const d=Math.min(window.devicePixelRatio||1,2);
-  W=innerWidth;H=innerHeight;
-  cvs.width=W*d;cvs.height=H*d;
-  ctx.setTransform(d,0,0,d,0,0);
-}
-addEventListener('resize',resize);resize();
+      let last = performance.now();
+      function frame(now) {
+        const dt = Math.min(.05, (now - last) / 1000); last = now;
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalCompositeOperation = 'lighter';
+        if (amb < AMBIENT && parts.length < 460) spawnAmbient();
+        for (let i = parts.length - 1; i >= 0; i--) {
+          const p = parts[i]; p.age += dt;
+          let alpha = 0, dead = false;
+          if (p.t === 'a') {                              /* ambient drifting dust */
+            p.y -= p.vy * dt;
+            p.x += Math.sin(p.age * p.sw + p.ph) * p.swA * dt;
+            if (p.y < -24) { p.y = H + 24; p.x = rnd(0, W); }
+            alpha = .32 + .3 * Math.sin(p.age * p.tw + p.ph);
+          } else if (p.t === 'b') {                       /* click burst */
+            p.vx *= Math.exp(-2.4 * dt); p.vy = p.vy * Math.exp(-2.4 * dt) - 14 * dt;
+            p.x += p.vx * dt; p.y += p.vy * dt;
+            alpha = Math.max(0, 1 - p.age / p.life); dead = p.age >= p.life;
+          } else if (p.t === 'p') {                      /* falling petal sliver */
+            p.x += (p.vx + Math.sin(p.age * p.sw + p.ph) * p.swA) * dt;
+            p.y += p.vy * dt;
+            p.vx *= Math.exp(-.3 * dt);
+            alpha = Math.max(0, 1 - p.age / p.life) * .7;
+            dead = p.age >= p.life || p.y > H + 24;
+          } else {                                     /* sunflower golden motes */
+            p.vx *= Math.exp(-.5 * dt); p.vy = p.vy * Math.exp(-.5 * dt) - 6 * dt;
+            p.x += p.vx * dt; p.y += p.vy * dt;
+            alpha = Math.max(0, 1 - p.age / p.life) * .8; dead = p.age >= p.life;
+          }
+          if (dead) { if (p.t === 'a') amb--; parts.splice(i, 1); continue; }
+          const s = p.r * 9;
+          ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
+          ctx.drawImage(p.spr, p.x - s / 2, p.y - s / 2, s, s);
+        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(t => { last = t; frame(t); });
 
-const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const AMBIENT=RM?12:(innerWidth<700?34:64);
-const parts=[];let amb=0;
+      /* the sunflower occasionally releases golden motes; every bloomed
+         flower occasionally sheds a drifting petal sliver */
+      setInterval(() => {
+        if (document.hidden) return;
+        Object.values(F).forEach(f => {
+          if (!f.group || !f.group.classList.contains('bloomed')) return;
+          const r = f.svg.getBoundingClientRect();
+          if (!r.width) return;
+          const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+          if (f.key === 'sun') {
+            emitGold(cx, cy);
+            if (Math.random() < .7) emitGold(cx, cy);
+          }
+          if (Math.random() < .35) emitPetal(cx + rnd(-r.width * .3, r.width * .3), cy + rnd(-20, 40), f.palette);
+        });
+      }, 1500);
 
-/* pre-rendered radial glow sprite per colour */
-const spriteCache={};
-function sprite(rgb){
-  const key=rgb.join(',');
-  if(spriteCache[key])return spriteCache[key];
-  const c=document.createElement('canvas');c.width=c.height=64;
-  const g=c.getContext('2d');
-  const gr=g.createRadialGradient(32,32,0,32,32,32);
-  gr.addColorStop(0,'rgba(255,255,255,.95)');
-  gr.addColorStop(.22,`rgba(${key},.85)`);
-  gr.addColorStop(.55,`rgba(${key},.28)`);
-  gr.addColorStop(1,`rgba(${key},0)`);
-  g.fillStyle=gr;g.fillRect(0,0,64,64);
-  spriteCache[key]=c;return c;
-}
-const COL={white:[226,232,255],pink:[255,158,195],crimson:[255,92,138],
-           lav:[201,167,255],gold:[255,209,102],goldHot:[255,183,3]};
+      /* ============================================================
+         USER INTERACTION — hover glows are pure CSS; clicks re-bloom,
+         spawn a ripple + particle burst, and excite the flower.
+         ============================================================ */
+      function excite(card) {
+        card.classList.add('excited');
+        clearTimeout(card._t);
+        card._t = setTimeout(() => card.classList.remove('excited'), 1700);
+      }
+      function ripple(card, x, y) {
+        const r = document.createElement('div');
+        r.className = 'ripple';
+        r.style.left = x + 'px'; r.style.top = y + 'px';
+        card.appendChild(r);
+        setTimeout(() => r.remove(), 980);
+      }
+      Object.values(F).forEach(f => {
+        /* FIX: the particle canvas is viewport-fixed, so bursts must use
+           viewport coordinates (e.clientX/Y) — card-relative values made
+           clicks on the lily/sunflower flash light in the rose's corner. */
+        const go = (vx, vy, cx, cy) => { rebloom(f.key); excite(f.card); ripple(f.card, cx, cy); burst(vx, vy, f.palette); };
+        f.card.addEventListener('click', e => {
+          const r = f.card.getBoundingClientRect();
+          go(e.clientX, e.clientY, e.clientX - r.left, e.clientY - r.top);
+        });
+        f.card.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const r = f.card.getBoundingClientRect();
+            go(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2);
+          }
+        });
+      });
 
-function spawnAmbient(){
-  parts.push({t:'a',x:rnd(0,W),y:rnd(0,H),vy:rnd(6,20),r:rnd(.5,1.7),
-    ph:rnd(0,TAU),tw:rnd(.4,1.6),sw:rnd(.2,.9),swA:rnd(4,16),age:0,
-    spr:sprite(pick([COL.white,COL.white,COL.white,COL.lav,COL.pink]))});
-  amb++;
-}
-function burst(x,y,palette,n){
-  n=Math.min(n||26,460-parts.length);
-  for(let i=0;i<n;i++){
-    const a=rnd(0,TAU),sp=rnd(50,240);
-    parts.push({t:'b',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-rnd(0,40),
-      r:rnd(.9,2.4),age:0,life:rnd(.7,1.4),spr:sprite(pick(palette))});
-  }
-}
-function emitGold(x,y){
-  const a=rnd(0,TAU),sp=rnd(10,34);
-  parts.push({t:'e',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-rnd(4,18),
-    r:rnd(1,2.4),age:0,life:rnd(1.8,3),spr:sprite(Math.random()<.5?COL.gold:COL.goldHot)});
-}
-/* falling petal: a tiny coloured sliver fluttering down from a flower */
-function emitPetal(x,y,palette){
-  parts.push({t:'p',x,y,vx:rnd(-14,14),vy:rnd(8,22),r:rnd(1.6,3.4),age:0,
-    life:rnd(4,7),ph:rnd(0,TAU),sw:rnd(.8,2),swA:rnd(18,42),
-    spr:sprite(pick(palette))});
-}
-for(let i=0;i<AMBIENT;i++)spawnAmbient();
+      /* ============================================================
+         STAGE NAVIGATION — one flower on stage at a time; prev/next
+         buttons, dots and arrow keys flip between them. A flower
+         blooms the first time it takes the stage.
+         ============================================================ */
+      const ORDER = ['rose', 'lily', 'sun'];
+      let stage = 0;
+      function showStage(i) {
+        stage = (i + ORDER.length) % ORDER.length;
+        ORDER.forEach((key, k) => {
+          const f = F[key];
+          f.card.classList.toggle('active', k === stage);
+          if (k === stage && !f.seen) { f.seen = true; setTimeout(() => setBloom(key), 350); }
+        });
+        $$('.dot').forEach((d, k) => d.classList.toggle('active', k === stage));
+      }
+      $('#nav-prev').addEventListener('click', () => showStage(stage - 1));
+      $('#nav-next').addEventListener('click', () => showStage(stage + 1));
+      $$('.dot').forEach(d => d.addEventListener('click', () => showStage(ORDER.indexOf(d.dataset.goto))));
+      addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') showStage(stage - 1);
+        else if (e.key === 'ArrowRight') showStage(stage + 1);
+      });
 
-let last=performance.now();
-function frame(now){
-  const dt=Math.min(.05,(now-last)/1000);last=now;
-  ctx.clearRect(0,0,W,H);
-  ctx.globalCompositeOperation='lighter';
-  if(amb<AMBIENT&&parts.length<460)spawnAmbient();
-  for(let i=parts.length-1;i>=0;i--){
-    const p=parts[i];p.age+=dt;
-    let alpha=0,dead=false;
-    if(p.t==='a'){                              /* ambient drifting dust */
-      p.y-=p.vy*dt;
-      p.x+=Math.sin(p.age*p.sw+p.ph)*p.swA*dt;
-      if(p.y<-24){p.y=H+24;p.x=rnd(0,W);}
-      alpha=.32+.3*Math.sin(p.age*p.tw+p.ph);
-    }else if(p.t==='b'){                       /* click burst */
-      p.vx*=Math.exp(-2.4*dt);p.vy=p.vy*Math.exp(-2.4*dt)-14*dt;
-      p.x+=p.vx*dt;p.y+=p.vy*dt;
-      alpha=Math.max(0,1-p.age/p.life);dead=p.age>=p.life;
-    }else if(p.t==='p'){                      /* falling petal sliver */
-      p.x+=(p.vx+Math.sin(p.age*p.sw+p.ph)*p.swA)*dt;
-      p.y+=p.vy*dt;
-      p.vx*=Math.exp(-.3*dt);
-      alpha=Math.max(0,1-p.age/p.life)*.7;
-      dead=p.age>=p.life||p.y>H+24;
-    }else{                                     /* sunflower golden motes */
-      p.vx*=Math.exp(-.5*dt);p.vy=p.vy*Math.exp(-.5*dt)-6*dt;
-      p.x+=p.vx*dt;p.y+=p.vy*dt;
-      alpha=Math.max(0,1-p.age/p.life)*.8;dead=p.age>=p.life;
-    }
-    if(dead){if(p.t==='a')amb--;parts.splice(i,1);continue;}
-    const s=p.r*9;
-    ctx.globalAlpha=Math.min(1,Math.max(0,alpha));
-    ctx.drawImage(p.spr,p.x-s/2,p.y-s/2,s,s);
-  }
-  ctx.globalAlpha=1;
-  requestAnimationFrame(frame);
-}
-requestAnimationFrame(t=>{last=t;frame(t);});
-
-/* the sunflower occasionally releases golden motes; every bloomed
-   flower occasionally sheds a drifting petal sliver */
-setInterval(()=>{
-  if(document.hidden)return;
-  Object.values(F).forEach(f=>{
-    if(!f.group||!f.group.classList.contains('bloomed'))return;
-    const r=f.svg.getBoundingClientRect();
-    if(!r.width)return;
-    const cx=r.left+r.width/2,cy=r.top+r.height/2;
-    if(f.key==='sun'){
-      emitGold(cx,cy);
-      if(Math.random()<.7)emitGold(cx,cy);
-    }
-    if(Math.random()<.35)emitPetal(cx+rnd(-r.width*.3,r.width*.3),cy+rnd(-20,40),f.palette);
-  });
-},1500);
-
-/* ============================================================
-   USER INTERACTION — hover glows are pure CSS; clicks re-bloom,
-   spawn a ripple + particle burst, and excite the flower.
-   ============================================================ */
-function excite(card){
-  card.classList.add('excited');
-  clearTimeout(card._t);
-  card._t=setTimeout(()=>card.classList.remove('excited'),1700);
-}
-function ripple(card,x,y){
-  const r=document.createElement('div');
-  r.className='ripple';
-  r.style.left=x+'px';r.style.top=y+'px';
-  card.appendChild(r);
-  setTimeout(()=>r.remove(),980);
-}
-Object.values(F).forEach(f=>{
-  /* FIX: the particle canvas is viewport-fixed, so bursts must use
-     viewport coordinates (e.clientX/Y) — card-relative values made
-     clicks on the lily/sunflower flash light in the rose's corner. */
-  const go=(vx,vy,cx,cy)=>{rebloom(f.key);excite(f.card);ripple(f.card,cx,cy);burst(vx,vy,f.palette);};
-  f.card.addEventListener('click',e=>{
-    const r=f.card.getBoundingClientRect();
-    go(e.clientX,e.clientY,e.clientX-r.left,e.clientY-r.top);
-  });
-  f.card.addEventListener('keydown',e=>{
-    if(e.key==='Enter'||e.key===' '){
-      e.preventDefault();
-      const r=f.card.getBoundingClientRect();
-      go(r.left+r.width/2,r.top+r.height/2,r.width/2,r.height/2);
-    }
-  });
-});
-
-/* ============================================================
-   STAGE NAVIGATION — one flower on stage at a time; prev/next
-   buttons, dots and arrow keys flip between them. A flower
-   blooms the first time it takes the stage.
-   ============================================================ */
-const ORDER=['rose','lily','sun'];
-let stage=0;
-function showStage(i){
-  stage=(i+ORDER.length)%ORDER.length;
-  ORDER.forEach((key,k)=>{
-    const f=F[key];
-    f.card.classList.toggle('active',k===stage);
-    if(k===stage&&!f.seen){f.seen=true;setTimeout(()=>setBloom(key),350);}
-  });
-  $$('.dot').forEach((d,k)=>d.classList.toggle('active',k===stage));
-}
-$('#nav-prev').addEventListener('click',()=>showStage(stage-1));
-$('#nav-next').addEventListener('click',()=>showStage(stage+1));
-$$('.dot').forEach(d=>d.addEventListener('click',()=>showStage(ORDER.indexOf(d.dataset.goto))));
-addEventListener('keydown',e=>{
-  if(e.key==='ArrowLeft')showStage(stage-1);
-  else if(e.key==='ArrowRight')showStage(stage+1);
-});
-
-/* ============================================================
-   INIT — build all geometry, then bloom each flower as it
-   enters the viewport (staggered on first load).
-   ============================================================ */
-Object.values(F).forEach(f=>{
-  f.build();f.built=true;
-  f.nodes=$$('.petal,.seed',f.group);
-  buildPlant(f);
-  buildDecor(f.svg,f.accent);
-});
-showStage(0);
-})();
-</script>
+      /* ============================================================
+         INIT — build all geometry, then bloom each flower as it
+         enters the viewport (staggered on first load).
+         ============================================================ */
+      Object.values(F).forEach(f => {
+        f.build(); f.built = true;
+        f.nodes = $$('.petal,.seed', f.group);
+        buildPlant(f);
+        buildDecor(f.svg, f.accent);
+      });
+      showStage(0);
+    })();
+  </script>
 </body>
+
 </html>

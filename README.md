@@ -13,7 +13,7 @@ A premium interactive generative flower gallery — **hand-coded entirely from S
 | Flower                   | Meaning             | Details                                                                           |
 | ------------------------ | ------------------- | --------------------------------------------------------------------------------- |
 | 🌹 **Rose** — _Passion_  | Deep crimson layers | 60 petals across 8 rings, phyllotaxis spiral heart, rim-light strokes, dew drops  |
-| 🌸 **Lily** — _Elegance_ | Lavender whorls     | 22 petals in 3 whorls, dorsal stripes, freckles, stamens with drifting pollen     |
+| 🌸 **Oriental Lily** — _Elegance_ | Bold magenta star | 18 broad star petals in 3 whorls, white rims, ruffled recurved edges, dark-pink speckles, long yellow-green stamens |
 | 🌻 **Sunflower** — _Joy_ | Golden radial burst | 84 petals, 170 spiral seeds (golden angle 137.5°), glowing disc, sheen highlights |
 
 Each flower grows on a **complete plant** — a self-drawing stem, alternating leaves that unfold as the stem grows, and a green calyx of sepals beneath the blossom.
@@ -23,6 +23,7 @@ Each flower grows on a **complete plant** — a self-drawing stem, alternating l
 ## ✨ Features
 
 - **Generative botany** — every petal, seed, and leaf is placed by code using golden-angle phyllotaxis and layered gradients
+- **Dramatic Oriental lily** — six-pointed magenta star with white-edged, ruffled petals that curve outward, speckled throats, and long yellow-green stamens rising from a green-gold heart
 - **Blooming animations** — staggered per-petal delays with springy `cubic-bezier` easing; click any flower to re-bloom it
 - **Particle system** — a single lightweight canvas renders ambient star-dust, click bursts, sunflower gold motes, and falling petals
 - **Staged gallery** — one flower on stage at a time; navigate with ‹ › buttons, dots, or ← → arrow keys
