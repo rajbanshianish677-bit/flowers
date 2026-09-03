@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Programmer's Flowers — Generative Botanical Art</title>
+  <title>Flowers — Generative Botanical Art</title>
   <style>
     /* ============================================================
-   PROGRAMMER'S FLOWERS
+   FLOWERS
    Generative botanical art — pure HTML + CSS + SVG + vanilla JS.
    No images. No frameworks. Everything below is geometry.
    ------------------------------------------------------------
@@ -105,6 +105,30 @@
       font-size: clamp(.82rem, 1.5vw, 1.02rem);
       letter-spacing: .12em;
       font-weight: 350
+    }
+
+    /* highlighted dedication phrases — glowing pink accents */
+    .subtitle .hl {
+      color: #ffb3d4;
+      font-weight: 600;
+      text-shadow: 0 0 16px rgba(255, 107, 181, .65), 0 0 42px rgba(255, 107, 181, .3);
+      animation: hlPulse 3.6s ease-in-out infinite
+    }
+
+    .subtitle .hl:nth-child(2) {
+      animation-delay: 1.8s
+    }
+
+    @keyframes hlPulse {
+
+      0%,
+      100% {
+        text-shadow: 0 0 12px rgba(255, 107, 181, .5), 0 0 34px rgba(255, 107, 181, .22)
+      }
+
+      50% {
+        text-shadow: 0 0 22px rgba(255, 107, 181, .85), 0 0 58px rgba(255, 107, 181, .42)
+      }
     }
 
     .hint {
@@ -994,8 +1018,9 @@
   </svg>
 
   <header class="site-head">
-    <h1 class="title">Programmer&rsquo;s Flowers</h1>
-    <p class="subtitle">Three luminous blossoms, grown line-by-line from pure SVG geometry</p>
+    <h1 class="title">Phool for a Fool Girl</h1>
+    <p class="subtitle"><span class="hl">who scolds me whenever I&rsquo;m wrong</span> &nbsp;&middot;&nbsp; <span
+        class="hl">supports and cares</span></p>
     <div class="divider" aria-hidden="true"><span class="line"></span><span class="bud"></span><span
         class="line r"></span></div>
     <p class="hint">hover a flower &nbsp;&middot;&nbsp; click to bloom &nbsp;&middot;&nbsp; arrows to browse</p>

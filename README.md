@@ -1,6 +1,4 @@
-# 🌸 Programmer's Flowers
-
-> Three luminous blossoms, grown line-by-line from pure SVG geometry.
+# 🌸 Flowers
 
 A premium interactive generative flower gallery — **hand-coded entirely from SVG paths, gradients, and filters**. No images. No frameworks. No external requests. Everything you see is geometry, math, and light.
 
@@ -10,11 +8,11 @@ A premium interactive generative flower gallery — **hand-coded entirely from S
 
 ## 🌹 The Collection
 
-| Flower                   | Meaning             | Details                                                                           |
-| ------------------------ | ------------------- | --------------------------------------------------------------------------------- |
-| 🌹 **Rose** — _Passion_  | Deep crimson layers | 60 petals across 8 rings, phyllotaxis spiral heart, rim-light strokes, dew drops  |
-| 🌸 **Oriental Lily** — _Elegance_ | Bold magenta star | 18 broad star petals in 3 whorls, white rims, ruffled recurved edges, dark-pink speckles, long yellow-green stamens |
-| 🌻 **Sunflower** — _Joy_ | Golden radial burst | 84 petals, 170 spiral seeds (golden angle 137.5°), glowing disc, sheen highlights |
+| Flower                            | Meaning             | Details                                                                                                             |
+| --------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| 🌹 **Rose** — _Passion_           | Deep crimson layers | 60 petals across 8 rings, phyllotaxis spiral heart, rim-light strokes, dew drops                                    |
+| 🌸 **Oriental Lily** — _Elegance_ | Bold magenta star   | 18 broad star petals in 3 whorls, white rims, ruffled recurved edges, dark-pink speckles, long yellow-green stamens |
+| 🌻 **Sunflower** — _Joy_          | Golden radial burst | 84 petals, 170 spiral seeds (golden angle 137.5°), glowing disc, sheen highlights                                   |
 
 Each flower grows on a **complete plant** — a self-drawing stem, alternating leaves that unfold as the stem grows, and a green calyx of sepals beneath the blossom.
 
