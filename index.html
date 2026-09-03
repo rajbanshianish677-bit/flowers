@@ -850,17 +850,37 @@
         font-size: 1.2rem
       }
 
-      /* blossoms fill more of the card on small screens */
+      /* smaller blossoms on phones: heads stay proportional to the
+         plant so the stem and leaves remain clearly visible instead
+         of being swallowed by the bloom */
       #rose .flower-live,
-      #lily .flower-live,
-      #sunflower .flower-live {
-        scale: 1.3
+      #lily .flower-live {
+        scale: 1.12
       }
 
+      #sunflower .flower-live {
+        scale: .95
+      }
+
+      /* a longer, sturdier stem with fuller leaves — the plant is
+         scaled about its own center so it grows in place */
+      #rose .plant,
+      #lily .plant,
+      #sunflower .plant {
+        transform-box: fill-box;
+        transform-origin: center;
+        scale: 1.12
+      }
+
+      /* heads sit anchored atop their stems: the calyx connects
+         them and a clear stretch of stem + leaves shows below */
       #rose .flower-hover,
-      #lily .flower-hover,
+      #lily .flower-hover {
+        translate: 0 -55px
+      }
+
       #sunflower .flower-hover {
-        translate: 0 -40px
+        translate: 0 -30px
       }
 
       /* lighter atmosphere on phones — skip the heavy grain layer */
@@ -935,11 +955,19 @@
       }
     }
 
-    /* touch devices have no hover — keep names visible once bloomed */
+    /* touch devices have no hover — keep names visible once bloomed.
+       The svg-level zoom is disabled too, so tapping can't scale the
+       plant and slide the blossom down over the stem and leaves —
+       the flower stays pinned in one place on its stem. */
     @media (hover:none) {
       .flower-card.bloomed .flower-label {
         opacity: 1;
         transform: translate(-50%, 0)
+      }
+
+      .flower-card:hover .flower-svg,
+      .flower-card.excited .flower-svg {
+        transform: none
       }
     }
 
