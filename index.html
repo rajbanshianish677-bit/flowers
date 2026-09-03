@@ -3,7 +3,9 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050308">
+  <meta name="description" content="An interactive generative flower gallery — pure SVG geometry, no images, no frameworks.">
   <title>Flowers — Generative Botanical Art</title>
   <style>
     /* ============================================================
@@ -732,21 +734,34 @@
       text-transform: uppercase
     }
 
+    /* tablets & small laptops */
     @media (max-width:1020px) {
       .flower-card {
         width: min(92vw, 560px)
       }
     }
 
+    /* phones — larger touch targets, tighter layout, lighter effects */
     @media (max-width:640px) {
+
+      /* card is 94vw — drop the garden's side padding so the flower
+         never pushes past the viewport (no horizontal scrolling) */
+      .garden {
+        padding-left: 0;
+        padding-right: 0
+      }
+
       .flower-card {
-        width: min(92vw, 430px);
-        min-height: 0
+        width: min(94vw, 430px);
+        min-height: 0;
+        border-radius: 24px;
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px)
       }
 
       .nav-btn {
-        width: 46px;
-        height: 46px;
+        width: 48px;
+        height: 48px;
         font-size: 1.35rem
       }
 
@@ -754,12 +769,17 @@
         gap: 11px
       }
 
+      .stage-nav {
+        gap: 18px;
+        padding: 1.6vh 4vw 1vh
+      }
+
       .site-head {
-        padding-top: 6vh
+        padding: 5vh 5vw 3vh
       }
 
       .title {
-        font-size: clamp(2.2rem, 10vw, 3rem)
+        font-size: clamp(2rem, 9vw, 2.8rem)
       }
 
       .subtitle {
@@ -798,6 +818,68 @@
       #sunflower .flower-hover {
         translate: 0 -40px
       }
+
+      /* lighter atmosphere on phones — skip the heavy grain layer */
+      .noise {
+        display: none
+      }
+
+      .vignette {
+        background: radial-gradient(140% 110% at 50% 42%, transparent 58%, rgba(2, 0, 8, .6) 100%)
+      }
+    }
+
+    /* very small phones — keep everything reachable */
+    @media (max-width:380px) {
+      .title {
+        font-size: clamp(1.7rem, 11vw, 2.2rem)
+      }
+
+      .subtitle {
+        font-size: .74rem
+      }
+
+      .nav-btn {
+        width: 44px;
+        height: 44px
+      }
+
+      .stage-nav {
+        gap: 12px
+      }
+
+      .stage-dots {
+        gap: 9px
+      }
+
+      .dot {
+        width: 13px;
+        height: 13px
+      }
+    }
+
+    /* landscape phones: shrink the header so the flower stays visible */
+    @media (max-height:480px) and (orientation:landscape) {
+      .site-head {
+        padding: 2vh 5vw 1.5vh
+      }
+
+      .title {
+        font-size: clamp(1.6rem, 6vh, 2.2rem)
+      }
+
+      .subtitle {
+        margin-top: .4rem;
+        font-size: .74rem
+      }
+
+      .hint {
+        display: none
+      }
+
+      .divider {
+        margin: 1rem auto 0
+      }
     }
 
     /* touch devices have no hover — keep names visible once bloomed */
@@ -819,12 +901,37 @@
       .flower-hover,
       .halo,
       .core-glow,
-      .title {
+      .title,
+      .subtitle .hl {
         animation: none !important
       }
 
       .petal {
         --dur: .7s
+      }
+    }
+
+    /* low-end devices: drop the costliest paint effects while keeping
+       every feature — fewer particles are spawned in JS as well */
+    @media (max-width:640px),
+    (prefers-reduced-motion:reduce) {
+
+      .flower-card,
+      .nav-btn {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none
+      }
+
+      .flower-card {
+        background: radial-gradient(120% 100% at 50% 0%, rgba(255, 255, 255, .07), rgba(255, 255, 255, .02) 46%, transparent 72%)
+      }
+
+      .title {
+        animation: none
+      }
+
+      .fl-emoji {
+        filter: none
       }
     }
   </style>
@@ -1628,19 +1735,25 @@
          Ambient star-dust always drifts; bursts accompany clicks;
          the sunflower breathes golden motes from its heart.
          Glow sprites are pre-rendered once (cheap drawImage).
+         Adaptive: phones & low-end devices get fewer particles,
+         a capped DPR, and the loop pauses in hidden tabs.
          ============================================================ */
       const cvs = $('#fx'), ctx = cvs.getContext('2d');
       let W = 0, H = 0;
+      /* device tier: phones / reduced-motion / small screens = LOW */
+      const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const LOW = RM || innerWidth < 700 || navigator.hardwareConcurrency === 1;
+      const DPR_CAP = LOW ? 1.5 : 2;                    /* fewer pixels to paint */
       function resize() {
-        const d = Math.min(window.devicePixelRatio || 1, 2);
+        const d = Math.min(window.devicePixelRatio || 1, DPR_CAP);
         W = innerWidth; H = innerHeight;
         cvs.width = W * d; cvs.height = H * d;
         ctx.setTransform(d, 0, 0, d, 0, 0);
       }
       addEventListener('resize', resize); resize();
 
-      const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const AMBIENT = RM ? 12 : (innerWidth < 700 ? 34 : 64);
+      const AMBIENT = LOW ? (RM ? 10 : 22) : 64;
+      const MAXP = LOW ? 160 : 460;                    /* hard particle ceiling */
       const parts = []; let amb = 0;
 
       /* pre-rendered radial glow sprite per colour */
@@ -1672,7 +1785,7 @@
         amb++;
       }
       function burst(x, y, palette, n) {
-        n = Math.min(n || 26, 460 - parts.length);
+        n = Math.min(n || (LOW ? 14 : 26), MAXP - parts.length);
         for (let i = 0; i < n; i++) {
           const a = rnd(0, TAU), sp = rnd(50, 240);
           parts.push({
@@ -1699,11 +1812,18 @@
       for (let i = 0; i < AMBIENT; i++)spawnAmbient();
 
       let last = performance.now();
+      let running = true;
+      /* pause the canvas loop in hidden tabs — saves battery & CPU */
+      document.addEventListener('visibilitychange', () => {
+        running = !document.hidden;
+        if (running) { last = performance.now(); requestAnimationFrame(frame); }
+      });
       function frame(now) {
+        if (!running) return;
         const dt = Math.min(.05, (now - last) / 1000); last = now;
         ctx.clearRect(0, 0, W, H);
         ctx.globalCompositeOperation = 'lighter';
-        if (amb < AMBIENT && parts.length < 460) spawnAmbient();
+        if (amb < AMBIENT && parts.length < MAXP) spawnAmbient();
         for (let i = parts.length - 1; i >= 0; i--) {
           const p = parts[i]; p.age += dt;
           let alpha = 0, dead = false;
@@ -1738,7 +1858,7 @@
       requestAnimationFrame(t => { last = t; frame(t); });
 
       /* the sunflower occasionally releases golden motes; every bloomed
-         flower occasionally sheds a drifting petal sliver */
+         flower occasionally sheds a drifting petal sliver (rarer on LOW tier) */
       setInterval(() => {
         if (document.hidden) return;
         Object.values(F).forEach(f => {
@@ -1748,11 +1868,11 @@
           const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
           if (f.key === 'sun') {
             emitGold(cx, cy);
-            if (Math.random() < .7) emitGold(cx, cy);
+            if (Math.random() < (LOW ? .35 : .7)) emitGold(cx, cy);
           }
-          if (Math.random() < .35) emitPetal(cx + rnd(-r.width * .3, r.width * .3), cy + rnd(-20, 40), f.palette);
+          if (Math.random() < (LOW ? .18 : .35)) emitPetal(cx + rnd(-r.width * .3, r.width * .3), cy + rnd(-20, 40), f.palette);
         });
-      }, 1500);
+      }, LOW ? 2600 : 1500);
 
       /* ============================================================
          USER INTERACTION — hover glows are pure CSS; clicks re-bloom,
